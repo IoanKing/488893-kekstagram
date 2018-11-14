@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Иван Суслов](https://up.htmlacademy.ru/javascript/16/user/488893).
-* Наставник: `Неизвестно`.
+* Наставник: [Борис Ванюшин](https://up.htmlacademy.ru/javascript/16/user/62080).
 
 ---
 
