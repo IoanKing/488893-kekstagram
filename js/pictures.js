@@ -1,4 +1,6 @@
 
+'use strict';
+
 /* --------------- CONSTANS -----------------*/
 var PICTURES_COUNT = 25;
 var COMMENT_AVATAR_COUNT = 6;
@@ -106,18 +108,18 @@ var setBigPicture = function (current, block, picturesObj) {
   block.querySelector(BIG_IMG_SELECTOR).src = picturesObj[current].url;
   block.querySelector(LIKES_COUNT_SELECTOR).textContent = picturesObj[current].likes;
   block.querySelector(SOCIAL_CAPTION_SELECTOR).textContent = picturesObj[current].description;
-}
+};
 
 var removeAllChild = function (parent, element) {
   for (var i = 0; i < element.length; i++) {
     parent.removeChild(element[i]);
   }
-}
+};
 
-/*------- create Pictures collections --------*/
+/* ------- create Pictures collections -------- */
 
 var pictures = fillPicturesCollection(comments, descriptions, PICTURES_COUNT, MAX_COUNT_COMMENTS);
-var picturesElement = document.querySelector(PICTURE_SELECTOR)
+var picturesElement = document.querySelector(PICTURE_SELECTOR);
 var picturesTemplate = document.querySelector(PICTURE_TAMPLATE_SELECTOR)
     .content
     .querySelector(PICTURE_ITEM_SELECTOR);
@@ -128,7 +130,7 @@ for (var j = 0; j < pictures.length; j++) {
 }
 picturesElement.appendChild(fragment);
 
-/*------- change Big Picture --------*/
+/* ------- change Big Picture -------- */
 
 var picturesList = document.querySelectorAll(PICTURE_ITEM_SELECTOR);
 var pictureBlock = document.querySelector(BIG_PICTURE_SELECTOR);
@@ -152,12 +154,12 @@ picturesList.forEach(function (element, i) {
     removeAllChild(socialComments, socialCommentList);
 
     var fragmentComments = document.createDocumentFragment();
-    for (var j = 0; j < pictures[currentPictureId].comment.length; j++) {
-      var newComment = createComment(pictures[currentPictureId].comment[j], socialCommantTemplate);
+    for (var k = 0; k < pictures[currentPictureId].comment.length; k++) {
+      var newComment = createComment(pictures[currentPictureId].comment[k], socialCommantTemplate);
       fragmentComments.appendChild(newComment);
     }
     socialComments.appendChild(fragmentComments);
-  })
+  });
 });
 
 var closeModal = document.querySelector(BIG_CLOSE_SELECTOR);
