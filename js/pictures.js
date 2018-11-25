@@ -23,6 +23,8 @@ var BIG_IMG_SELECTOR = '.big-picture__img > img';
 var BIG_CLOSE_SELECTOR = '.big-picture__cancel';
 
 var HIDDEN_CLASS = 'hidden';
+var BODY_SELECTOR = 'body';
+var MODAL_OPEN_CLASS = 'modal-open';
 
 var LIKES_COUNT_SELECTOR = '.likes-count';
 
@@ -130,6 +132,7 @@ picturesElement.appendChild(fragment);
 
 var picturesList = document.querySelectorAll(PICTURE_ITEM_SELECTOR);
 var pictureBlock = document.querySelector(BIG_PICTURE_SELECTOR);
+var bodyBlock = document.querySelector(BODY_SELECTOR);
 
 picturesList.forEach(function (element, i) {
   element.addEventListener('click', function (evt) {
@@ -138,6 +141,7 @@ picturesList.forEach(function (element, i) {
     var currentPictureId = i;
 
     pictureBlock.classList.remove(HIDDEN_CLASS);
+    bodyBlock.classList.add(MODAL_OPEN_CLASS);
 
     setBigPicture(currentPictureId, pictureBlock, pictures);
 
@@ -162,5 +166,6 @@ if (closeModal) {
   closeModal.addEventListener('click', function (evt) {
     evt.preventDefault();
     pictureBlock.classList.add(HIDDEN_CLASS);
+    bodyBlock.classList.remove(MODAL_OPEN_CLASS);
   });
 }
