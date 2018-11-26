@@ -67,24 +67,24 @@ var getRandomElement = function (collection) {
   return collection[getRandomInt(0, collection.length)];
 };
 
-var setPictureComments = function (urlPicture, commentToPicture, descriptionToPicture) {
+var setPictureComments = function (pictureUrl, pictureComments, descriptionToPicture) {
   var randomCountComment = getRandomInt(0, COMMENTS_MAX_COUNT) + COMMENTS_MIN_COUNT;
   var commentsToPicture = [];
   for (var i = 0; i < randomCountComment; i++) {
-    commentsToPicture.push(getRandomElement(commentToPicture));
+    commentsToPicture.push(getRandomElement(pictureComments));
   }
   return {
-    url: PICTURE_PATCH + urlPicture + PICTURE_FORMAT,
+    url: PICTURE_PATCH + pictureUrl + PICTURE_FORMAT,
     likes: getRandomInt(1, MAX_LIKE_VALUE),
     comment: commentsToPicture,
     description: getRandomElement(descriptionToPicture)
   };
 };
 
-var fillPicturesCollection = function (commentToPicture, descriptionToPicture) {
+var fillPicturesCollection = function (pictureComments, pictureDescription) {
   var picturesCollections = [];
   for (var i = 1; i <= PICTURES_COUNT; i++) {
-    picturesCollections.push(setPictureComments(i, commentToPicture, descriptionToPicture));
+    picturesCollections.push(setPictureComments(i, pictureComments, pictureDescription));
   }
   return picturesCollections;
 };
@@ -105,10 +105,10 @@ var createComment = function (commentsArr, template) {
   return commentTemplate;
 };
 
-var setBigPicture = function (current, block, picturesObj) {
-  block.querySelector(Selectors.BIG_IMG_SELECTOR).src = picturesObj[current].url;
-  block.querySelector(Selectors.LIKES_COUNT_SELECTOR).textContent = picturesObj[current].likes;
-  block.querySelector(Selectors.SOCIAL_CAPTION_SELECTOR).textContent = picturesObj[current].description;
+var setBigPicture = function (current, block, picture) {
+  block.querySelector(Selectors.BIG_IMG_SELECTOR).src = picture[current].url;
+  block.querySelector(Selectors.LIKES_COUNT_SELECTOR).textContent = picture[current].likes;
+  block.querySelector(Selectors.SOCIAL_CAPTION_SELECTOR).textContent = picture[current].description;
 };
 
 var removeChildren = function (parent, element) {
