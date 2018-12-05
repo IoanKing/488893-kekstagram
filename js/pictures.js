@@ -9,7 +9,7 @@ var COMMENTS_MIN_COUNT = 1;
 var MAX_LIKE_VALUE = 200;
 var SCALE_MAX = 100;
 var SCALE_MIN = 25;
-var SCALE_DEFAULT = 55;
+// var SCALE_DEFAULT = 55;
 var SCALE_STEP = 25;
 
 var FILTER_DEFAULT = 20;
@@ -250,7 +250,6 @@ var setScale = function (element, value, scale) {
 };
 
 var changeEffectLevel = function () {
-  console.log('Навели!');
   var beginCoord = FILTER_DEFAULT;
   var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
   var element = document.querySelector(Selectors.PREVIEW);
