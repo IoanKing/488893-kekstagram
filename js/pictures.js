@@ -61,49 +61,45 @@ var Classes = {
 };
 
 var Effects = {
-  CHROME: {
-    name: 'chrome',
+  chrome: {
     filter: 'grayscale',
     min: 0,
     max: 1,
     unit: '',
   },
-  SEPIA: {
-    name: 'sepia',
+  sepia: {
     filter: 'sepia',
     min: 0,
     max: 1,
     unit: '',
   },
-  MARVIN: {
-    name: 'marvin',
+  marvin: {
     filter: 'invert',
     min: 0,
     max: 100,
     unit: '%',
   },
-  PHOBOS: {
-    name: 'phobos',
+  phobos: {
     filter: 'blur',
     min: 1,
     max: 3,
     unit: 'px',
   },
-  HEAT: {
-    name: 'heat',
+  heat: {
     filter: 'brightness',
     min: 1,
     max: 3,
     unit: '',
   },
-  NONE: {
-    name: 'none',
+  none: {
     filter: '',
     min: 1,
     max: 1,
     unit: '',
-  }
+  },
 };
+
+var EFFECTS_LIST = Object.keys(Effects);
 
 var Shortcuts = {
   ESC_KEYCODE: 27,
@@ -239,80 +235,52 @@ var openPopup = function (element, additionalElement) {
   });
 };
 
-var getValueElement = function (element) {
-  var scaleValue = element.getAttribute('value');
-  var scaleLastSimbol = scaleValue.substr(scaleValue.length - 1, scaleValue.length);
-  if (typeof scaleLastSimbol !== 'number') {
-    return parseInt(scaleValue.substr(0, scaleValue.length - 1), 10);
-  } else {
-    return parseInt(scaleValue, 10);
-  }
-};
-
-var setScale = function (element, valueAttribute, direction) {
-  /* direction Increase = 1, decrease = -1, nothing = 0  */
-  var changedValue = Math.max(ScaleSettings.SCALE_MIN, Math.min(getValueElement(valueAttribute) + ScaleSettings.SCALE_STEP * direction, ScaleSettings.SCALE_MAX));
+var setScale = function (element, valueAttribute, modificator) {
+  /* modificator: Increase = 1, decrease = -1, nothing = 0  */
+  var scaleValue = parseInt(valueAttribute.getAttribute('value'), 10);
+  var changedValue = Math.max(ScaleSettings.SCALE_MIN, Math.min(scaleValue + ScaleSettings.SCALE_STEP * modificator, ScaleSettings.SCALE_MAX));
 
   valueAttribute.setAttribute('value', changedValue.toString() + '%');
   element.style.transform = 'scale(' + changedValue / 100 + ')';
 };
 
-var calculationProportion = function (min, max, direction) {
-  return (direction) ? ((max - min) / 100) : (100 / (max - min));
+var getProportion = function (min, max, modificator) {
+  return (modificator) ? ((max - min) / 100) : (100 / (max - min));
 };
 
-var setFilter = function (element, filter, value, unit) {
-  if (filter) {
-    element.style.filter = filter + '(' + value + unit + ')';
-  } else {
-    element.style.filter = '';
-  }
+var getFilter = function (filter, value, unit) {
+  return (filter) ? filter + '(' + value + unit + ')' : '';
 };
 
-var checkExsistValue = function (object, checkValue) {
-  for (var key in object) {
-    if (object[key].name === checkValue) {
-      return object[key];
-    }
-  }
-  return false;
-};
+var setEffect = function (element, effect, value) {
+  var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
+  var filter = Effects[effect];
+  var proportion = getProportion(filter.min, filter.max, 1);
+  var proportionUndo = getProportion(filter.min, filter.max, 0);
 
-var changeEffect = function (element, effect, effectLevel, step, isChanged) {
-  var filter = checkExsistValue(Effects, effect);
-  if (filter) {
-    var proportion = calculationProportion(filter.min, filter.max, 1);
-    var proportionUndo = calculationProportion(filter.min, filter.max, 0);
-    var newValue = (isChanged) ? parseInt(effectLevel.value, 10) + step : FILTER_DEFAULT;
+  var valueFilter = Math.max(filter.min, Math.min(proportion * value + filter.min, filter.max));
 
-    var valueFilter = Math.max(filter.min, Math.min(proportion * newValue + filter.min, filter.max));
-
-    setFilter(element, filter.filter, valueFilter, filter.unit);
-
-    effectLevel.value = Math.round((valueFilter - filter.min) * proportionUndo);
-  } else {
-    effectLevel.value = FILTER_DEFAULT;
-    element.style.filter = '';
-  }
+  element.style.filter = getFilter(filter.filter, valueFilter, filter.unit);
+  effectLevel.value = Math.round((valueFilter - filter.min) * proportionUndo);
 };
 
 /* Функция будет изменять фильтр при движении мышки */
-var changeEffectLevel = function () {
+var setEffectSlider = function () {
   var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
-  var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
 
   var elementEffect = imagePreviews.getAttribute('class');
   var effect = elementEffect.substring(elementEffect.lastIndexOf('--') + 2, elementEffect.length);
 
-  changeEffect(imagePreviews, effect, effectLevel, -20, true);
+  /* значение step будет измеряться функцией расчета разницы координат */
+  var newEffectLevel = 20;
+  setEffect(imagePreviews, effect, newEffectLevel);
 };
 
-var changingEffectClass = function (element, changedClass) {
-  for (var key in Effects) {
-    if (Effects[key].name === changedClass && changedClass !== Effects.NONE.name) {
-      element.classList.add(Classes.EFFECT_PREVIEW + '--' + Effects[key].name);
-    } else {
-      element.classList.remove(Classes.EFFECT_PREVIEW + '--' + Effects[key].name);
+var setClassEffect = function (element, effect) {
+  for (var i = 0; i < EFFECTS_LIST.length; i++) {
+    element.classList.remove(Classes.EFFECT_PREVIEW + '--' + EFFECTS_LIST[i]);
+    if (effect === EFFECTS_LIST[i]) {
+      element.classList.add(Classes.EFFECT_PREVIEW + '--' + effect);
     }
   }
 };
@@ -380,10 +348,9 @@ slider.classList.add(Classes.HIDDEN_CLASS);
 imageEffects.forEach(function (element) {
   element.addEventListener('click', function () {
     var effect = element.getAttribute('value');
-    var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
-    changingEffectClass(imagePreviews, effect);
-    changeEffect(imagePreviews, effect, effectLevel, 0);
-    if (effect !== Effects.NONE.name) {
+    setClassEffect(imagePreviews, effect);
+    setEffect(imagePreviews, effect, FILTER_DEFAULT);
+    if (effect !== EFFECTS_LIST[EFFECTS_LIST.length - 1]) {
       slider.classList.remove(Classes.HIDDEN_CLASS);
     } else {
       slider.classList.add(Classes.HIDDEN_CLASS);
@@ -391,7 +358,7 @@ imageEffects.forEach(function (element) {
   });
 });
 
-slider.addEventListener('mouseup', changeEffectLevel);
+slider.addEventListener('mouseup', setEffectSlider);
 
 /* ------- CHANGE SCALE -------- */
 
