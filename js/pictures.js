@@ -257,8 +257,8 @@ var setScale = function (element, valueAttribute, direction) {
   element.style.transform = 'scale(' + changedValue / 100 + ')';
 };
 
-var calculationProportion = function (min, max, duration) {
-  return (duration) ? ((max - min) / 100) : (100 / (max - min));
+var calculationProportion = function (min, max, direction) {
+  return (direction) ? ((max - min) / 100) : (100 / (max - min));
 };
 
 var setFilter = function (element, filter, value, unit) {
@@ -274,12 +274,12 @@ var checkExsistValue = function (object, checkValue) {
   return false;
 };
 
-var changeEffect = function (element, effect, effectLevel, step, changed) {
+var changeEffect = function (element, effect, effectLevel, step, isChanged) {
   var filter = checkExsistValue(Effects, effect);
   if (filter) {
     var proportion = calculationProportion(filter.min, filter.max, 1);
     var proportionUndo = calculationProportion(filter.min, filter.max, 0);
-    var newValue = (changed) ? parseInt(effectLevel.value, 10) + step : FILTER_DEFAULT;
+    var newValue = (isChanged) ? parseInt(effectLevel.value, 10) + step : FILTER_DEFAULT;
 
     var valueFilter = Math.max(filter.min, Math.min(proportion * newValue + filter.min, filter.max));
 
