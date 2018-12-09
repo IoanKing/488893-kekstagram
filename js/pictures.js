@@ -61,37 +61,37 @@ var Classes = {
 };
 
 var Effects = {
-  chrome: {
+  CHROME: {
     filter: 'grayscale',
     min: 0,
     max: 1,
     unit: '',
   },
-  sepia: {
+  SEPIA: {
     filter: 'sepia',
     min: 0,
     max: 1,
     unit: '',
   },
-  marvin: {
+  MARVIN: {
     filter: 'invert',
     min: 0,
     max: 100,
     unit: '%',
   },
-  phobos: {
+  PHOBOS: {
     filter: 'blur',
     min: 1,
     max: 3,
     unit: 'px',
   },
-  heat: {
+  HEAT: {
     filter: 'brightness',
     min: 1,
     max: 3,
     unit: '',
   },
-  none: {
+  NONE: {
     filter: '',
     min: 1,
     max: 1,
@@ -254,7 +254,7 @@ var getFilter = function (filter, value, unit) {
 
 var setEffect = function (element, effect, value) {
   var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
-  var filter = Effects[effect];
+  var filter = Effects[effect.toUpperCase()];
   var proportion = getProportion(filter.min, filter.max, 1);
   var proportionUndo = getProportion(filter.min, filter.max, 0);
 
@@ -278,8 +278,8 @@ var setEffectSlider = function () {
 
 var setClassEffect = function (element, effect) {
   for (var i = 0; i < EFFECTS_LIST.length; i++) {
-    element.classList.remove(Classes.EFFECT_PREVIEW + '--' + EFFECTS_LIST[i]);
-    if (effect === EFFECTS_LIST[i]) {
+    element.classList.remove(Classes.EFFECT_PREVIEW + '--' + EFFECTS_LIST[i].toLowerCase());
+    if (effect === EFFECTS_LIST[i].toLowerCase()) {
       element.classList.add(Classes.EFFECT_PREVIEW + '--' + effect);
     }
   }
@@ -350,7 +350,7 @@ imageEffects.forEach(function (element) {
     var effect = element.getAttribute('value');
     setClassEffect(imagePreviews, effect);
     setEffect(imagePreviews, effect, FILTER_DEFAULT);
-    if (effect !== EFFECTS_LIST[EFFECTS_LIST.length - 1]) {
+    if (effect !== EFFECTS_LIST[EFFECTS_LIST.length - 1].toLowerCase()) {
       slider.classList.remove(Classes.HIDDEN_CLASS);
     } else {
       slider.classList.add(Classes.HIDDEN_CLASS);
