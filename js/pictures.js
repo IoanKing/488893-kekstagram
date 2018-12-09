@@ -7,10 +7,12 @@ var COMMENTS_AVATAR_COUNT = 6;
 var COMMENTS_MAX_COUNT = 2;
 var COMMENTS_MIN_COUNT = 1;
 var MAX_LIKE_VALUE = 200;
-var SCALE_MAX = 100;
-var SCALE_MIN = 25;
-// var SCALE_DEFAULT = 55;
-var SCALE_STEP = 25;
+
+var ScaleSettings = {
+  SCALE_MAX: 100,
+  SCALE_MIN: 25,
+  SCALE_STEP: 25,
+};
 
 var FILTER_DEFAULT = 20;
 
@@ -41,21 +43,21 @@ var Selectors = {
   EDITOR_FORM: '.img-upload__overlay',
 
   EDITOR_PIN: '.effect-level__pin',
-  HASHTAGS_FOCUS: '.text__hashtags:focus',
-  DESCRIPTION_FOCUS: '.text__description:focus',
-  COMMENT_FOCUS: '.social__footer-text:focus',
 
   SCALE_SMALLER: '.scale__control--smaller',
   SCALE_BIGGER: '.scale__control--bigger',
   SCALE_VALUE: '.scale__control--value',
   SLIDER: '.img-upload__effect-level',
-  EFFECT_LEVEL: '.effect-level',
+  EFFECT_LEVEL: '.effect-level__value',
 };
 
 var Classes = {
   HIDDEN_CLASS: 'hidden',
   MODAL_OPEN_CLASS: 'modal-open',
   EFFECT_PREVIEW: 'effects__preview',
+  HASHTAGS_FOCUS: 'text__hashtags',
+  DESCRIPTION_FOCUS: 'text__description',
+  COMMENT_FOCUS: 'social__footer-text',
 };
 
 var Effects = {
@@ -101,11 +103,16 @@ var Shortcuts = {
   ENTER_KEYCODE: 13,
 };
 
-var PICTURE_PATCH = 'photos/';
-var PICTURE_FORMAT = '.jpg';
-
-var COMMENT_AVATAR_PATCH = 'img/avatar-';
-var COMMENT_AVATAR_FORMAT = '.svg';
+var images = {
+  PICTURE: {
+    patch: 'photos/',
+    format: '.jpg'
+  },
+  COMMENT_AVATAR: {
+    patch: 'img/avatar-',
+    format: '.svg'
+  }
+};
 
 /* --------------- ARRAYS -----------------*/
 
@@ -144,7 +151,7 @@ var setPictureComments = function (pictureUrl, pictureComments, descriptionToPic
     commentsToPicture.push(getRandomElement(pictureComments));
   }
   return {
-    url: PICTURE_PATCH + pictureUrl + PICTURE_FORMAT,
+    url: images.PICTURE.patch + pictureUrl + images.PICTURE.format,
     likes: getRandomInt(1, MAX_LIKE_VALUE),
     comment: commentsToPicture,
     description: getRandomElement(descriptionToPicture)
@@ -170,7 +177,7 @@ var renderPictures = function (picture, picturesTemplate) {
 
 var createComment = function (commentsArr, template) {
   var commentTemplate = template.cloneNode(true);
-  commentTemplate.querySelector(Selectors.SOCIAL_PICTURE).src = COMMENT_AVATAR_PATCH + getRandomInt(1, COMMENTS_AVATAR_COUNT) + COMMENT_AVATAR_FORMAT;
+  commentTemplate.querySelector(Selectors.SOCIAL_PICTURE).src = images.COMMENT_AVATAR.patch + getRandomInt(1, COMMENTS_AVATAR_COUNT) + images.COMMENT_AVATAR.format;
   commentTemplate.querySelector(Selectors.SOCIAL_TEXT).textContent = commentsArr;
   return commentTemplate;
 };
@@ -200,10 +207,6 @@ var removeChildren = function (parent, element) {
   }
 };
 
-var onFocusInput = function (element) {
-  return document.querySelector(element);
-};
-
 var closePopup = function (element, additionalElement) {
   var closureElement = document.querySelector(element);
   closureElement.classList.add(Classes.HIDDEN_CLASS);
@@ -221,17 +224,12 @@ var openPopup = function (element, additionalElement) {
     openingAdditionalForm.classList.add(Classes.MODAL_OPEN_CLASS);
   }
   document.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === Shortcuts.ESC_KEYCODE && !onFocusInput(Selectors.HASHTAGS_FOCUS) && !onFocusInput(Selectors.DESCRIPTION_FOCUS) && !onFocusInput(Selectors.COMMENT_FOCUS)) {
+    var curentActiveElement = document.activeElement;
+    var hasNoFocus = (curentActiveElement.classList.contains(Classes.HASHTAGS_FOCUS) || curentActiveElement.classList.contains(Classes.DESCRIPTION_FOCUS) || curentActiveElement.classList.contains(Classes.COMMENT_FOCUS)) ? false : true;
+    if (evt.keyCode === Shortcuts.ESC_KEYCODE && hasNoFocus) {
       closePopup(element, additionalElement);
     }
   });
-};
-
-var removingClass = function (element) {
-  var classList = imagePreviews.className.split(' ').join(', ');
-  if (classList) {
-    element.classList.remove(classList);
-  }
 };
 
 var getValueElement = function (element) {
@@ -244,41 +242,43 @@ var getValueElement = function (element) {
   }
 };
 
-var setScale = function (element, value, scale) {
-  value.setAttribute('value', scale.toString() + '%');
-  element.style.transform = 'scale(' + scale / 100 + ')';
+var setScale = function (element, valueAttribute, direction) {
+  /* direction Increase = 1, decrease = -1, nothing = 0  */
+  var changedValue = Math.max(ScaleSettings.SCALE_MIN, Math.min(getValueElement(valueAttribute) + ScaleSettings.SCALE_STEP * direction, ScaleSettings.SCALE_MAX));
+
+  valueAttribute.setAttribute('value', changedValue.toString() + '%');
+  element.style.transform = 'scale(' + changedValue / 100 + ')';
 };
 
 var changeEffectLevel = function () {
   var beginCoord = FILTER_DEFAULT;
   var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
-  var element = document.querySelector(Selectors.PREVIEW);
-  var prewievElement = document.querySelector(Selectors.EFFECT_PREVIEW);
-  var effect = prewievElement.getAttribute('value');
+  var element = document.querySelector(Selectors.IMAGE_PREVIEW);
+  var effect = element.getAttribute('class');
   var setValue = beginCoord;
   switch (effect) {
     case Classes.EFFECT_PREVIEW + '--' + Effects.CHROME.name:
-      setValue = beginCoord;
+      setValue = beginCoord + 20;
       element.style.filter = Effects.CHROME.effect + '(' + setValue + Effects.CHROME.unit + ')';
       effectLevel.setAttribute('value', setValue);
       break;
     case Classes.EFFECT_PREVIEW + '--' + Effects.SEPIA.name:
-      setValue = beginCoord;
+      setValue = beginCoord + 20;
       element.style.filter = Effects.SEPIA.effect + '(' + setValue + Effects.SEPIA.unit + ')';
       effectLevel.setAttribute('value', setValue);
       break;
     case Classes.EFFECT_PREVIEW + '--' + Effects.MARVIN.name:
-      setValue = beginCoord;
+      setValue = beginCoord + 20;
       element.style.filter = Effects.MARVIN.effect + '(' + setValue + Effects.MARVIN.unit + ')';
       effectLevel.setAttribute('value', setValue);
       break;
     case Classes.EFFECT_PREVIEW + '--' + Effects.FOBOS.name:
-      setValue = beginCoord;
+      setValue = beginCoord + 20;
       element.style.filter = Effects.FOBOS.effect + '(' + setValue + Effects.FOBOS.unit + ')';
       effectLevel.setAttribute('value', setValue);
       break;
     case Classes.EFFECT_PREVIEW + '--' + Effects.HEAT.name:
-      setValue = beginCoord;
+      setValue = beginCoord + 20;
       element.style.filter = Effects.HEAT.effect + '(' + setValue + Effects.HEAT.unit + ')';
       effectLevel.setAttribute('value', setValue);
       break;
@@ -347,12 +347,14 @@ var imageEffects = document.querySelectorAll(Selectors.IMAGE_FILTER);
 var scaleImgValue = document.querySelector(Selectors.SCALE_VALUE);
 var slider = document.querySelector(Selectors.SLIDER);
 
+slider.classList.add(Classes.HIDDEN_CLASS);
+
 imageEffects.forEach(function (element) {
   element.addEventListener('click', function () {
     var effect = element.getAttribute('value');
-    removingClass(imagePreviews);
+    imagePreviews.className = '';
     if (effect !== 'none') {
-      imagePreviews.classList.add(Classes.EFFECT_PREVIEW + '--' + effect);
+      imagePreviews.className = Classes.EFFECT_PREVIEW + '--' + effect;
       slider.classList.remove(Classes.HIDDEN_CLASS);
     } else {
       slider.classList.add(Classes.HIDDEN_CLASS);
@@ -364,23 +366,15 @@ slider.addEventListener('mouseup', changeEffectLevel);
 
 /* ------- CHANGE SCALE -------- */
 
-var buttonScaleSmaller = document.querySelector(Selectors.SCALE_SMALLER);
-var buttonScaleBigger = document.querySelector(Selectors.SCALE_BIGGER);
+var buttonScaleDecrease = document.querySelector(Selectors.SCALE_SMALLER);
+var buttonScaleIncrease = document.querySelector(Selectors.SCALE_BIGGER);
 
-buttonScaleSmaller.addEventListener('click', function () {
-  var changedValue = getValueElement(scaleImgValue) - SCALE_STEP;
-  if (changedValue >= SCALE_MIN) {
-    setScale(imagePreviews, scaleImgValue, changedValue);
-  } else {
-    setScale(imagePreviews, scaleImgValue, SCALE_MIN);
-  }
+setScale(imagePreviews, scaleImgValue, 0);
+
+buttonScaleDecrease.addEventListener('click', function () {
+  setScale(imagePreviews, scaleImgValue, -1);
 });
 
-buttonScaleBigger.addEventListener('click', function () {
-  var changedValue = getValueElement(scaleImgValue) + SCALE_STEP;
-  if (changedValue <= SCALE_MAX) {
-    setScale(imagePreviews, scaleImgValue, changedValue);
-  } else {
-    setScale(imagePreviews, scaleImgValue, SCALE_MAX);
-  }
+buttonScaleIncrease.addEventListener('click', function () {
+  setScale(imagePreviews, scaleImgValue, 1);
 });
