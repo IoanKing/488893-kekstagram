@@ -99,8 +99,8 @@ var Effects = {
   NONE: {
     name: 'none',
     filter: '',
-    min: 0,
-    max: 0,
+    min: 1,
+    max: 1,
     unit: '',
   }
 };
@@ -262,7 +262,11 @@ var calculationProportion = function (min, max, direction) {
 };
 
 var setFilter = function (element, filter, value, unit) {
-  element.style.filter = filter + '(' + value + unit + ')';
+  if (filter) {
+    element.style.filter = filter + '(' + value + unit + ')';
+  } else {
+    element.style.filter = '';
+  }
 };
 
 var checkExsistValue = function (object, checkValue) {
@@ -301,6 +305,16 @@ var changeEffectLevel = function () {
   var effect = elementEffect.substring(elementEffect.lastIndexOf('--') + 2, elementEffect.length);
 
   changeEffect(imagePreviews, effect, effectLevel, -20, true);
+};
+
+var changingEffectClass = function (element, changedClass) {
+  for (var key in Effects) {
+    if (Effects[key].name === changedClass && changedClass !== Effects.NONE.name) {
+      element.classList.add(Classes.EFFECT_PREVIEW + '--' + Effects[key].name);
+    } else {
+      element.classList.remove(Classes.EFFECT_PREVIEW + '--' + Effects[key].name);
+    }
+  }
 };
 
 /* ------- create Pictures collections -------- */
@@ -367,14 +381,12 @@ imageEffects.forEach(function (element) {
   element.addEventListener('click', function () {
     var effect = element.getAttribute('value');
     var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
-    imagePreviews.className = '';
+    changingEffectClass(imagePreviews, effect);
+    changeEffect(imagePreviews, effect, effectLevel, 0);
     if (effect !== Effects.NONE.name) {
-      imagePreviews.className = Classes.EFFECT_PREVIEW + '--' + effect;
       slider.classList.remove(Classes.HIDDEN_CLASS);
-      changeEffect(imagePreviews, effect, effectLevel, 0);
     } else {
       slider.classList.add(Classes.HIDDEN_CLASS);
-      changeEffect(imagePreviews, '', effectLevel, 0);
     }
   });
 });
