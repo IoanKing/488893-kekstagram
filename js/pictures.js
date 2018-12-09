@@ -14,7 +14,7 @@ var ScaleSettings = {
   SCALE_STEP: 25,
 };
 
-var FILTER_DEFAULT = 20;
+var FILTER_DEFAULT = 100;
 
 var Selectors = {
   PICTURE: '.pictures',
@@ -82,8 +82,8 @@ var Effects = {
     max: 100,
     unit: '%',
   },
-  FOBOS: {
-    name: 'fobos',
+  PHOBOS: {
+    name: 'phobos',
     filter: 'blur',
     min: 1,
     max: 3,
@@ -96,6 +96,13 @@ var Effects = {
     max: 3,
     unit: '',
   },
+  NONE: {
+    name: 'none',
+    filter: '',
+    min: 0,
+    max: 0,
+    unit: '',
+  }
 };
 
 var Shortcuts = {
@@ -250,42 +257,50 @@ var setScale = function (element, valueAttribute, direction) {
   element.style.transform = 'scale(' + changedValue / 100 + ')';
 };
 
-var changeEffectLevel = function () {
-  var beginCoord = FILTER_DEFAULT;
-  var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
-  var element = document.querySelector(Selectors.IMAGE_PREVIEW);
-  var effect = element.getAttribute('class');
-  var setValue = beginCoord;
-  switch (effect) {
-    case Classes.EFFECT_PREVIEW + '--' + Effects.CHROME.name:
-      setValue = beginCoord + 20;
-      element.style.filter = Effects.CHROME.effect + '(' + setValue + Effects.CHROME.unit + ')';
-      effectLevel.setAttribute('value', setValue);
-      break;
-    case Classes.EFFECT_PREVIEW + '--' + Effects.SEPIA.name:
-      setValue = beginCoord + 20;
-      element.style.filter = Effects.SEPIA.effect + '(' + setValue + Effects.SEPIA.unit + ')';
-      effectLevel.setAttribute('value', setValue);
-      break;
-    case Classes.EFFECT_PREVIEW + '--' + Effects.MARVIN.name:
-      setValue = beginCoord + 20;
-      element.style.filter = Effects.MARVIN.effect + '(' + setValue + Effects.MARVIN.unit + ')';
-      effectLevel.setAttribute('value', setValue);
-      break;
-    case Classes.EFFECT_PREVIEW + '--' + Effects.FOBOS.name:
-      setValue = beginCoord + 20;
-      element.style.filter = Effects.FOBOS.effect + '(' + setValue + Effects.FOBOS.unit + ')';
-      effectLevel.setAttribute('value', setValue);
-      break;
-    case Classes.EFFECT_PREVIEW + '--' + Effects.HEAT.name:
-      setValue = beginCoord + 20;
-      element.style.filter = Effects.HEAT.effect + '(' + setValue + Effects.HEAT.unit + ')';
-      effectLevel.setAttribute('value', setValue);
-      break;
-    default:
-      element.style.filter = '';
-      effectLevel.setAttribute('value', FILTER_DEFAULT);
+var calculationProportion = function (min, max, duration) {
+  return (duration) ? ((max - min) / 100) : (100 / (max - min));
+};
+
+var setFilter = function (element, filter, value, unit) {
+  element.style.filter = filter + '(' + value + unit + ')';
+};
+
+var checkExsistValue = function (object, checkValue) {
+  for (var key in object) {
+    if (object[key].name === checkValue) {
+      return object[key];
+    }
   }
+  return false;
+};
+
+var changeEffect = function (element, effect, effectLevel, step, changed) {
+  var filter = checkExsistValue(Effects, effect);
+  if (filter) {
+    var proportion = calculationProportion(filter.min, filter.max, 1);
+    var proportionUndo = calculationProportion(filter.min, filter.max, 0);
+    var newValue = (changed) ? parseInt(effectLevel.value, 10) + step : FILTER_DEFAULT;
+
+    var valueFilter = Math.max(filter.min, Math.min(proportion * newValue + filter.min, filter.max));
+
+    setFilter(element, filter.filter, valueFilter, filter.unit);
+
+    effectLevel.value = Math.round((valueFilter - filter.min) * proportionUndo);
+  } else {
+    effectLevel.value = FILTER_DEFAULT;
+    element.style.filter = '';
+  }
+};
+
+/* Функция будет изменять фильтр при движении мышки */
+var changeEffectLevel = function () {
+  var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
+  var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
+
+  var elementEffect = imagePreviews.getAttribute('class');
+  var effect = elementEffect.substring(elementEffect.lastIndexOf('--') + 2, elementEffect.length);
+
+  changeEffect(imagePreviews, effect, effectLevel, -20, true);
 };
 
 /* ------- create Pictures collections -------- */
@@ -344,7 +359,6 @@ closeBigPicture.addEventListener('click', function () {
 
 var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
 var imageEffects = document.querySelectorAll(Selectors.IMAGE_FILTER);
-var scaleImgValue = document.querySelector(Selectors.SCALE_VALUE);
 var slider = document.querySelector(Selectors.SLIDER);
 
 slider.classList.add(Classes.HIDDEN_CLASS);
@@ -352,12 +366,15 @@ slider.classList.add(Classes.HIDDEN_CLASS);
 imageEffects.forEach(function (element) {
   element.addEventListener('click', function () {
     var effect = element.getAttribute('value');
+    var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
     imagePreviews.className = '';
-    if (effect !== 'none') {
+    if (effect !== Effects.NONE.name) {
       imagePreviews.className = Classes.EFFECT_PREVIEW + '--' + effect;
       slider.classList.remove(Classes.HIDDEN_CLASS);
+      changeEffect(imagePreviews, effect, effectLevel, 0);
     } else {
       slider.classList.add(Classes.HIDDEN_CLASS);
+      changeEffect(imagePreviews, '', effectLevel, 0);
     }
   });
 });
@@ -366,6 +383,7 @@ slider.addEventListener('mouseup', changeEffectLevel);
 
 /* ------- CHANGE SCALE -------- */
 
+var scaleImgValue = document.querySelector(Selectors.SCALE_VALUE);
 var buttonScaleDecrease = document.querySelector(Selectors.SCALE_SMALLER);
 var buttonScaleIncrease = document.querySelector(Selectors.SCALE_BIGGER);
 
