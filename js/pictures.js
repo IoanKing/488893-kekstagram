@@ -18,7 +18,7 @@ var FILTER_DEFAULT = 100;
 
 var Selectors = {
   PICTURE: '.pictures',
-  PICTURE_TAMPLATE: '#picture',
+  PICTURE_TEMPLATE: '#picture',
   PICTURE_ITEM: '.picture',
   PICTURE_LINK: '.picture__img',
   PICTURE_LIKES: '.picture__likes',
@@ -321,7 +321,7 @@ var changingEffectClass = function (element, changedClass) {
 
 var pictures = fillPicturesCollection(comments, descriptions);
 var picturesElement = document.querySelector(Selectors.PICTURE);
-var picturesTemplate = document.querySelector(Selectors.PICTURE_TAMPLATE)
+var picturesTemplate = document.querySelector(Selectors.PICTURE_TEMPLATE)
     .content
     .querySelector(Selectors.PICTURE_ITEM);
 
