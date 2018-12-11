@@ -14,6 +14,15 @@ var ScaleSettings = {
   SCALE_STEP: 25,
 };
 
+var ValidationHashtags = {
+  MAX_LENGTH: 20,
+  MAX_TAGS: 5,
+};
+
+var ValidationDescription = {
+  MAX_LENGTH: 140,
+};
+
 var FILTER_DEFAULT = 100;
 
 var Selectors = {
@@ -49,6 +58,8 @@ var Selectors = {
   SCALE_VALUE: '.scale__control--value',
   SLIDER: '.img-upload__effect-level',
   EFFECT_LEVEL: '.effect-level__value',
+  HASHTAGS: '.text__hashtags',
+  DESCRIPTION: '.text__description',
 };
 
 var Classes = {
@@ -375,3 +386,51 @@ buttonScaleDecrease.addEventListener('click', function () {
 buttonScaleIncrease.addEventListener('click', function () {
   setScale(imagePreviews, scaleImgValue, 1);
 });
+
+/* ------------ VALIDATION ---------------*/
+
+var checkUniqueArray = function (array) {
+  var nonUnique = [];
+  for (var i = 0; i < array.length - 1; i++) {
+    for (var k = i + 1; k < array.length; k++) {
+      if (array[i].toLowerCase() === array[k].toLowerCase()) {
+        nonUnique.push(array[i]);
+      }
+    }
+  }
+  return nonUnique;
+};
+
+var getValidationHashtags = function (array) {
+  var unique = checkUniqueArray(array).join(', ');
+  var countHashtags = array.length;
+  for (var i = 0; i < array.length; i++) {
+    if (array[i][0] !== '#') {
+      return 'Хеш теги должны начинатся с символа #: "' + array[i] + '"';
+    } else if (array[i].length <= 1) {
+      return 'Хеш-тег не может состоять только из одной решётки.';
+    } else if (array[i].length >= ValidationHashtags.MAX_LENGTH) {
+      return 'Максимальная длина одного хэш-тега 20 символов, включая решётку: "' + array[i] + '"';
+    } else if (unique) {
+      return 'Один и тот же хэш-тег не может быть использован дважды: "' + unique + '"';
+    } else if (array[i].indexOf('#', 1) > 0) {
+      return 'Хэш-теги разделяются пробелами: "' + array[i] + '"';
+    } else if (countHashtags > ValidationHashtags.MAX_TAGS) {
+      return 'Нельзя указать больше пяти хэш-тегов: "' + countHashtags + '"';
+    }
+  }
+  return '';
+};
+
+var hashtagInput = document.querySelector(Selectors.HASHTAGS);
+
+hashtagInput.addEventListener('input', function (evt) {
+  var target = evt.target;
+  var valueHashtag = target.value.split(' ');
+  var validation = getValidationHashtags(valueHashtag);
+  evt.target.setCustomValidity(validation);
+});
+
+var descriptionInput = document.querySelector(Selectors.DESCRIPTION);
+
+descriptionInput.setAttribute('maxlength', ValidationDescription.MAX_LENGTH);
