@@ -131,7 +131,7 @@ var images = {
 var ValidationMessage = {
   ERROR_SYMBOL: 'Хеш теги должны начинатся с символа ' + ValidationHashtag.FIRST_SYMBOL + '.',
   ERROR_MINLENGTH: 'Хеш-тег не может состоять только из одного символа ' + ValidationHashtag.FIRST_SYMBOL + '.',
-  ERROR_MAXLENGTH: 'Максимальная длина одного хэш-тега ' + ValidationHashtag.MAX_TAGS + ' символов, включая решётку.',
+  ERROR_MAXLENGTH: 'Максимальная длина одного хэш-тега ' + ValidationHashtag.MAX_LENGTH + ' символов, включая решётку.',
   ERROR_DUBLICATES: 'Один и тот же хэш-тег не может быть использован дважды.',
   ERROR_SPACES: 'Хэш-теги разделяются пробелами.',
   ERROR_MAXHASHTAGS: 'Нельзя указать больше ' + ValidationHashtag.MAX_TAGS + ' хэш-тегов.',
@@ -398,39 +398,39 @@ buttonScaleIncrease.addEventListener('click', function () {
 
 /* ------------ VALIDATION ---------------*/
 
-var checkUniqueArray = function (array) {
-  var checkedArray = array.map(function (element) {
+var checkNonUniqueness = function (collection) {
+  var unifiedCollection = collection.map(function (element) {
     return element.toLowerCase();
   });
-  for (var i = 0; i < checkedArray.length - 1; i++) {
-    for (var k = i + 1; k < checkedArray.length; k++) {
-      if (checkedArray[i] === checkedArray[k]) {
-        return false;
+  for (var i = 0; i < unifiedCollection.length - 1; i++) {
+    for (var k = i + 1; k < unifiedCollection.length; k++) {
+      if (unifiedCollection[i] === unifiedCollection[k]) {
+        return true;
       }
     }
   }
-  return true;
+  return false;
 };
 
-var getValidationHashtags = function (array) {
-  var unique = checkUniqueArray(array);
-  for (var i = 0; i < array.length; i++) {
-    if (array[i][0] !== ValidationHashtag.FIRST_SYMBOL) {
+var getValidationHashtags = function (hashtags) {
+  var unique = checkNonUniqueness(hashtags);
+  for (var i = 0; i < hashtags.length; i++) {
+    if (hashtags[i][0] !== ValidationHashtag.FIRST_SYMBOL) {
       return ValidationMessage.ERROR_SYMBOL;
     }
-    if (array[i].length <= 1) {
+    if (hashtags[i].length === 1) {
       return ValidationMessage.ERROR_MINLENGTH;
     }
-    if (array[i].length >= ValidationHashtag.MAX_LENGTH) {
+    if (hashtags[i].length >= ValidationHashtag.MAX_LENGTH) {
       return ValidationMessage.ERROR_MAXLENGTH;
     }
-    if (!unique) {
+    if (unique) {
       return ValidationMessage.ERROR_DUBLICATES;
     }
-    if (array[i].indexOf(ValidationHashtag.FIRST_SYMBOL, 1) > 0) {
+    if (hashtags[i].lastIndexOf(ValidationHashtag.FIRST_SYMBOL) > 0) {
       return ValidationMessage.ERROR_SPACES;
     }
-    if (array.length > ValidationHashtag.MAX_TAGS) {
+    if (hashtags.length > ValidationHashtag.MAX_TAGS) {
       return ValidationMessage.ERROR_MAXHASHTAGS;
     }
   }
@@ -441,8 +441,8 @@ var hashtagInput = document.querySelector(Selectors.HASHTAGS);
 
 hashtagInput.addEventListener('input', function (evt) {
   var target = evt.target;
-  var valueHashtag = target.value.split(/\s+/);
-  var validation = getValidationHashtags(valueHashtag);
+  var parsedHashtags = target.value.split(/\s+/);
+  var validation = getValidationHashtags(parsedHashtags);
   evt.target.setCustomValidity(validation);
 });
 
