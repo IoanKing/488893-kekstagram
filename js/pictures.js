@@ -405,7 +405,7 @@ var checkUniqueArray = function (array) {
   for (var i = 0; i < checkedArray.length - 1; i++) {
     for (var k = i + 1; k < checkedArray.length; k++) {
       if (checkedArray[i] === checkedArray[k]) {
-        return false
+        return false;
       }
     }
   }
