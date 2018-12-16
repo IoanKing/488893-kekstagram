@@ -51,13 +51,15 @@ var Selectors = {
   UPLOAD_FILE: '#upload-file',
   EDITOR_FORM: '.img-upload__overlay',
 
-  EDITOR_PIN: '.effect-level__pin',
-
   SCALE_SMALLER: '.scale__control--smaller',
   SCALE_BIGGER: '.scale__control--bigger',
   SCALE_VALUE: '.scale__control--value',
   SLIDER: '.img-upload__effect-level',
-  EFFECT_LEVEL: '.effect-level__value',
+  EFFECT_ITEM: '.effects__item',
+  EFFECT_LEVEL: 'input[name="effect-level"]',
+  EFFECT_LEVEL_LINE: '.effect-level__line',
+  EFFECT_LEVEL_PIN: '.effect-level__pin',
+  EFFECT_LEVEL_DEPTH: '.effect-level__depth',
   HASHTAGS: '.text__hashtags',
   DESCRIPTION: '.text__description',
 };
@@ -274,26 +276,31 @@ var getFilter = function (filter, value, unit) {
 
 var setEffect = function (element, effect, value) {
   var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
+
+  var levelPin = document.querySelector(Selectors.EFFECT_LEVEL_PIN);
+  var levelDepth = document.querySelector(Selectors.EFFECT_LEVEL_DEPTH);
+
   var filter = Effects[effect.toUpperCase()];
   var proportion = getProportion(filter.min, filter.max, 1);
   var proportionUndo = getProportion(filter.min, filter.max, 0);
 
   var valueFilter = Math.max(filter.min, Math.min(proportion * value + filter.min, filter.max));
+  var valueFilterInPercent = Math.round((valueFilter - filter.min) * proportionUndo);
 
   element.style.filter = getFilter(filter.filter, valueFilter, filter.unit);
-  effectLevel.value = Math.round((valueFilter - filter.min) * proportionUndo);
+  effectLevel.setAttribute('value', valueFilterInPercent);
+
+  levelPin.style.left = valueFilterInPercent + '%';
+  levelDepth.style.width = valueFilterInPercent + '%';
 };
 
-/* Функция будет изменять фильтр при движении мышки */
-var setEffectSlider = function () {
+var setEffectSlider = function (value) {
   var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
 
   var elementEffect = imagePreviews.getAttribute('class');
   var effect = elementEffect.substring(elementEffect.lastIndexOf('--') + 2, elementEffect.length);
 
-  /* значение step будет измеряться функцией расчета разницы координат */
-  var newEffectLevel = 20;
-  setEffect(imagePreviews, effect, newEffectLevel);
+  setEffect(imagePreviews, effect, value);
 };
 
 var setClassEffect = function (element, effect) {
@@ -361,6 +368,7 @@ closeBigPicture.addEventListener('click', function () {
 
 var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
 var imageEffects = document.querySelectorAll(Selectors.IMAGE_FILTER);
+
 var slider = document.querySelector(Selectors.SLIDER);
 
 slider.classList.add(Classes.HIDDEN_CLASS);
@@ -378,7 +386,40 @@ imageEffects.forEach(function (element) {
   });
 });
 
-slider.addEventListener('mouseup', setEffectSlider);
+var getPercent = function (newValue, minValue, maxValue) {
+  return Math.round((Math.min(Math.max(newValue - minValue, 0), maxValue + minValue) / maxValue) * 100);
+};
+
+var onMouseDown = function (evt) {
+  evt.preventDefault();
+
+  var effectLine = evt.currentTarget.querySelector(Selectors.EFFECT_LEVEL_LINE);
+  var effectLineCoord = effectLine.getBoundingClientRect();
+
+  var pinValue = getPercent(evt.clientX, effectLineCoord.x, effectLineCoord.width);
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    pinValue = getPercent(moveEvt.clientX, effectLineCoord.x, effectLineCoord.width);
+
+    setEffectSlider(pinValue);
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    setEffectSlider(pinValue);
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+};
+
+slider.addEventListener('mousedown', onMouseDown);
 
 /* ------- CHANGE SCALE -------- */
 
