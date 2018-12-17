@@ -73,6 +73,9 @@
     EFFECT_LEVEL_LINE: '.effect-level__line',
     EFFECT_LEVEL_PIN: '.effect-level__pin',
     EFFECT_LEVEL_DEPTH: '.effect-level__depth',
+
+    VALIDATION_DESCRIPTION: '.text__description',
+    VALIDATION_HASHTAGS: '.text__hashtags',
   };
 
   var Classes = {
@@ -222,5 +225,20 @@
   buttonScaleIncrease.addEventListener('click', function () {
     setScale(imagePreviews, scaleImgValue, 1);
   });
+
+  /* --------------- VALIDATION -----------------*/
+
+  var hashtagInput = document.querySelector(Selectors.VALIDATION_HASHTAGS);
+
+  hashtagInput.addEventListener('input', function (evt) {
+    var target = evt.target;
+    var parsedHashtags = target.value.split(/\s+/);
+    var validation = window.validation.getValidationHashtags(parsedHashtags);
+    evt.target.setCustomValidity(validation);
+  });
+
+  var descriptionInput = document.querySelector(Selectors.VALIDATION_DESCRIPTION);
+
+  descriptionInput.setAttribute('maxlength', window.validation.MAX_LENGTH);
 
 })();
