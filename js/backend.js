@@ -7,16 +7,23 @@
   var URL_LOAD = 'https://js.dump.academy/kekstagram/data';
   var URL_SEND = 'https://js.dump.academy/kekstagram';
 
-  var ErrorElement = {
-    BLOCK: 'div',
-    STYLE: 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;',
-    POSITION: 'absolute',
-    LEFT: 0,
-    RIGHT: 0,
-    FONT_SIZE: '30px',
+  var TIMEOUT_REQUEST = 10000;
+
+  var ErrorMessage = {
+    ANSWER_STATUS: 'Статус ответа: ',
+    CONNECTION: 'Произошла ошибка соединения',
+    TIMEOUT_BEGIN: 'Запрос не успел выполниться за ',
+    TIMEOUT_END: 'мс'
   };
 
-  var backendLoad = function (onLoad, onError) {
+  var requestResultPopup = {
+    DISPLAY_AREA: 'main',
+    ERROR: 'error',
+    SUCCESS: 'success',
+    BUTTON: 'error__button',
+  };
+
+  var backendAction = function (onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
@@ -24,61 +31,56 @@
       if (xhr.status === 200) {
         onLoad(xhr.response);
       } else {
-        onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
+        onError(ErrorMessage.ANSWER_STATUS + xhr.status + ' ' + xhr.statusText);
       }
     });
     xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения');
+      onError(ErrorMessage.CONNECTION);
     });
     xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
+      onError(ErrorMessage.TIMEOUT_BEGIN + xhr.timeout + ErrorMessage.TIMEOUT_END);
     });
 
-    xhr.timeout = 10000; // 10s
+    xhr.timeout = TIMEOUT_REQUEST;
 
-    xhr.open('GET', URL_LOAD);
-    xhr.send();
-  };
+    if (typeof data === 'object') {
+      xhr.open('POST', URL_SEND);
+    } else {
+      xhr.open('GET', URL_LOAD);
+    }
 
-  var backendSave = function (data, onLoad, onError) {
-    var xhr = new XMLHttpRequest();
-    xhr.responseType = 'json';
-
-    xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
-        onLoad(xhr.response);
-      } else {
-        onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
-      }
-    });
-    xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения');
-    });
-    xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
-    });
-
-    xhr.timeout = 10000; // 10s
-
-    xhr.open('POST', URL_SEND);
     xhr.send(data);
   };
 
-  var errorHandler = function (errorMessage) {
-    var node = document.createElement(ErrorElement.BLOCK);
-    node.style = ErrorElement.STYLE;
-    node.style.position = ErrorElement.POSITION;
-    node.style.left = ErrorElement.LEFT;
-    node.style.right = ErrorElement.RIGHT;
-    node.style.fontSize = ErrorElement.FONT_SIZE;
+  var errorHandler = function () {
+    var messageArea = document.querySelector(requestResultPopup.DISPLAY_AREA);
+    var messageTemplate = document.querySelector('#' + requestResultPopup.ERROR)
+        .content
+        .querySelector('.' + requestResultPopup.ERROR);
 
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', node);
+    var fragment = document.createDocumentFragment();
+
+    fragment.appendChild(messageTemplate);
+
+    messageArea.appendChild(fragment);
+
+    window.forms.close();
+
+    messageArea.addEventListener('click', function (evt) {
+      if (evt.target.className === requestResultPopup.ERROR || evt.target.className === requestResultPopup.BUTTON) {
+        messageArea.removeChild(messageTemplate);
+      }
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.keyCode === window.util.ESC_KEYCODE) {
+        messageArea.removeChild(messageTemplate);
+      }
+    });
   };
 
   window.backend = {
-    load: backendLoad,
-    save: backendSave,
+    action: backendAction,
     error: errorHandler
   };
 

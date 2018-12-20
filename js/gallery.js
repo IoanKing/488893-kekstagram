@@ -28,7 +28,7 @@
     window.pictures = pictures;
   };
 
-  window.backend.load(successHandler, window.backend.error);
+  window.backend.action(successHandler, window.backend.error);
 
   /* ------- open Preview -------- */
 

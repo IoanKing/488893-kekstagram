@@ -270,7 +270,11 @@
   uploadPicture.addEventListener('submit', function (evt) {
     evt.preventDefault();
 
-    window.backend.save(new FormData(uploadPicture), onCloseForm, window.backend.error);
+    window.backend.action(onCloseForm, window.backend.error, new FormData(uploadPicture));
   });
+
+  window.forms = {
+    close: onCloseForm
+  };
 
 })();
