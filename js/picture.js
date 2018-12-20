@@ -12,11 +12,16 @@
   };
 
   window.picture = {
-    renderPictures: function (picture, picturesTemplate) {
+    renderPictures: function (picture, picturesTemplate, id) {
       var pictureElement = picturesTemplate.cloneNode(true);
-      pictureElement.querySelector(pictureSelectors.PICTURE_LINK).src = picture.url;
-      pictureElement.querySelector(pictureSelectors.PICTURE_LIKES).textContent = picture.likes;
-      pictureElement.querySelector(pictureSelectors.PICTURE_COMMENT).textContent = picture.comment.length;
+      var elementLink = pictureElement.querySelector(pictureSelectors.PICTURE_LINK);
+      var elementLikes = pictureElement.querySelector(pictureSelectors.PICTURE_LIKES);
+      var elementComment = pictureElement.querySelector(pictureSelectors.PICTURE_COMMENT);
+
+      elementLink.src = picture.url;
+      elementLink.setAttribute('data-id', id);
+      elementLikes.textContent = picture.likes;
+      elementComment.textContent = picture.comments.length;
 
       return pictureElement;
     }

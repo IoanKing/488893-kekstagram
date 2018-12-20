@@ -52,6 +52,7 @@
 
   var EFFECTS_LIST = Object.keys(Effects);
   var FILTER_DEFAULT = 100;
+  var SCALE_DEFAULT = 55;
 
   var Selectors = {
     EDITOR_CLOSE: '.img-upload__cancel',
@@ -76,6 +77,8 @@
 
     VALIDATION_DESCRIPTION: '.text__description',
     VALIDATION_HASHTAGS: '.text__hashtags',
+
+    UPLOAD_FORM: '#upload-select-image'
   };
 
   var Classes = {
@@ -115,6 +118,25 @@
 
     levelPin.style.left = valueFilterInPercent + '%';
     levelDepth.style.width = valueFilterInPercent + '%';
+  };
+
+  var onCloseForm = function () {
+    window.util.closePopup(Selectors.EDITOR_FORM);
+    uploadPicture.reset();
+
+    var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
+    imagePreviews.style = '';
+    document.querySelector(Selectors.EFFECT_LEVEL)
+            .setAttribute('value', FILTER_DEFAULT);
+    document.querySelector(Selectors.EFFECT_LEVEL_PIN)
+            .style.left = FILTER_DEFAULT + '%';
+    document.querySelector(Selectors.EFFECT_LEVEL_DEPTH)
+            .style.width = FILTER_DEFAULT + '%';
+    document.querySelector(Selectors.SCALE_VALUE)
+            .setAttribute('value', SCALE_DEFAULT);
+    setClassEffect(imagePreviews, 'none');
+    document.querySelector(Selectors.SLIDER)
+            .classList.add(Classes.HIDDEN_CLASS);
   };
 
   var setEffectSlider = function (value) {
@@ -177,11 +199,11 @@
 
   var openEditor = document.querySelector(Selectors.UPLOAD_FILE);
   openEditor.addEventListener('change', function () {
-    window.util.openPopup(Selectors.EDITOR_FORM, Selectors.EDITOR_FORM);
+    window.util.openPopup(Selectors.EDITOR_FORM);
 
     var closeEditor = document.querySelector(Selectors.EDITOR_CLOSE);
     closeEditor.addEventListener('click', function () {
-      window.util.closePopup(Selectors.EDITOR_FORM, Selectors.EDITOR_FORM);
+      window.util.closePopup(Selectors.EDITOR_FORM);
       openEditor.value = '';
     });
   });
@@ -240,5 +262,19 @@
   var descriptionInput = document.querySelector(Selectors.VALIDATION_DESCRIPTION);
 
   descriptionInput.setAttribute('maxlength', window.validation.MAX_LENGTH);
+
+  /* --------------- SEND DATA To SERVER -----------------*/
+
+  var uploadPicture = document.querySelector(Selectors.UPLOAD_FORM);
+
+  uploadPicture.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+
+    window.backend.action(onCloseForm, window.backend.error, new FormData(uploadPicture));
+  });
+
+  window.forms = {
+    close: onCloseForm
+  };
 
 })();
