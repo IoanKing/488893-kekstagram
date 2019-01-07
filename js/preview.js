@@ -1,6 +1,6 @@
 'use strict';
 
-/* Модуль отрисовки Большой картинки */
+/* Модуль отрисовки Большой картинки Preview */
 /* Зависимости: data.js, util.js */
 
 (function () {
@@ -37,7 +37,8 @@
 
   var commentCountText = {
     FROM: ' из ',
-    COMMENT: ' комментариев.'
+    COMMENT: ' комментариев.',
+    TAG: 'span'
   };
 
   var closeButton = document.querySelector(previewSelector.BIG_CLOSE);
@@ -47,10 +48,11 @@
 
   var socialCommentCount = previewBlock.querySelector(previewSelector.SOCIAL_COMMENT_COUNT);
 
+  /* setCommantCount text */
   socialCommentCount.innerHTML = '';
-  var commentsCountCurrent = document.createElement('span');
+  var commentsCountCurrent = document.createElement(commentCountText.TAG);
   commentsCountCurrent.classList.add(previewClass.COMMENTS_CURRENT_COUNT);
-  var commentsCountFull = document.createElement('span');
+  var commentsCountFull = document.createElement(commentCountText.TAG);
   commentsCountFull.classList.add(previewClass.COMMENTS_FULL_COUNT);
   var textFrom = document.createTextNode(commentCountText.FROM);
   var textCommentaries = document.createTextNode(commentCountText.COMMENT);
@@ -67,9 +69,8 @@
     window.util.closePopup(previewSelector.BIG_PICTURE, previewSelector.BODY);
   };
 
-  var getPreviewData = function () {
-    var targetElement = document.activeElement.querySelector(previewSelector.PICTURE_IMG);
-    var pictureId = targetElement.getAttribute('data-id');
+  var getPreviewData = function (element) {
+    var pictureId = element.getAttribute('data-id');
     window.util.openPopup(previewSelector.BIG_PICTURE, previewSelector.BODY);
     commentsData = window.gallery.elementList[pictureId];
     maxComment = Math.min(COMMENT_VIEW_MAX, commentsData.comments.length);
@@ -81,7 +82,14 @@
 
   var onOpenPreview = function (evt) {
     if (evt.target.classList.contains(previewClass.CLICK_TRAGET)) {
-      getPreviewData();
+      getPreviewData(evt.target);
+    }
+  };
+
+  var onKeydownPreview = function (evt) {
+    if (evt.keyCode === window.util.ENTER_KEYCODE) {
+      var tergetElement = evt.target.querySelector(previewSelector.PICTURE_IMG);
+      getPreviewData(tergetElement);
     }
   };
 
@@ -90,12 +98,6 @@
       maxComment = Math.min(maxComment + COMMENT_VIEW_MAX, commentsData.comments.length);
       commentsCountCurrent.textContent = maxComment;
       renderCommentlist(commentsData);
-    }
-  };
-
-  var onKeydownPreview = function (evt) {
-    if (evt.keyCode === window.util.ENTER_KEYCODE) {
-      getPreviewData();
     }
   };
 
