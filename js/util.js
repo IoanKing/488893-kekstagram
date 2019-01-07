@@ -43,10 +43,17 @@
     });
   };
 
+  var removeChildren = function (parent, element) {
+    for (var i = 0; i < element.length; i++) {
+      parent.removeChild(element[i]);
+    }
+  };
+
   window.util = {
     ESC_KEYCODE: Shortcuts.ESC_KEYCODE,
     ENTER_KEYCODE: Shortcuts.ENTER_KEYCODE,
     closePopup: closePopup,
-    openPopup: openPopup
+    openPopup: openPopup,
+    removeChildren: removeChildren
   };
 })();
