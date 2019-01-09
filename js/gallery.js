@@ -6,14 +6,19 @@
 (function () {
 
   var gallerySelector = {
-    PICTURE: '.pictures',
+    PICTURES: '.pictures',
     PICTURE_ITEM: '.picture',
     PICTURE_TEMPLATE: '#picture',
     IMG_FILTERS: '.img-filters',
-    IMG_FILTERS_ACTIVE: '.img-filters__button--active'
+    IMG_FILTERS_ACTIVE: '.img-filters__button--active',
+
+    PICTURE_IMG: '.picture__img',
+    PICTURE_LIKES: '.picture__likes',
+    PICTURE_COMMENT: '.picture__comments',
   };
 
   var galleryClass = {
+    PICTURE_IMG: 'picture__img',
     IMG_FILTERS_BUTTON: 'img-filters__button',
     IMG_FILTERS_ACTIVE: 'img-filters__button--active',
     IMG_FILTERS_INACTIIVE: 'img-filters--inactive'
@@ -27,28 +32,47 @@
 
   var MAX_NEW_PICTURES = 10;
 
-  var pictureList = [];
+  var picturesData = {};
+  var filteredData = {};
 
-  /* ------- create Pictures collections -------- */
   var filters = document.querySelector(gallerySelector.IMG_FILTERS);
-  filters.classList.remove(galleryClass.IMG_FILTERS_INACTIIVE);
+  var pictures = document.querySelector(gallerySelector.PICTURES);
+  window.activeFilter = document.querySelector(gallerySelector.IMG_FILTERS_ACTIVE);
 
-  var picturesElement = document.querySelector(gallerySelector.PICTURE);
-  var picturesTemplate = document.querySelector(gallerySelector.PICTURE_TEMPLATE)
-      .content
-      .querySelector(gallerySelector.PICTURE_ITEM);
+  /* -------------------- functions --------------------------- */
 
-  var render = function (data) {
+  var renderPictureList = function (data) {
+    filteredData = data;
+    var picturesElement = document.querySelector(gallerySelector.PICTURES);
+    var picturesTemplate = document.querySelector(gallerySelector.PICTURE_TEMPLATE)
+        .content
+        .querySelector(gallerySelector.PICTURE_ITEM);
     var elementList = picturesElement.querySelectorAll(gallerySelector.PICTURE_ITEM);
+
     window.util.removeChildren(picturesElement, elementList);
 
     var fragment = document.createDocumentFragment();
 
-    for (var j = 0; j < data.length; j++) {
-      fragment.appendChild(window.picture.renderPictures(data[j], picturesTemplate, j));
-    }
+    data.forEach(function (element, i) {
+      var picture = renderPicture(element, picturesTemplate, i);
+      fragment.appendChild(picture);
+    });
 
     picturesElement.appendChild(fragment);
+  };
+
+  var renderPicture = function (picture, picturesTemplate, id) {
+    var pictureElement = picturesTemplate.cloneNode(true);
+    var elementLink = pictureElement.querySelector(gallerySelector.PICTURE_IMG);
+    var elementLikes = pictureElement.querySelector(gallerySelector.PICTURE_LIKES);
+    var elementComment = pictureElement.querySelector(gallerySelector.PICTURE_COMMENT);
+
+    elementLink.src = picture.url;
+    elementLikes.textContent = picture.likes;
+    elementComment.textContent = picture.comments.length;
+    elementLink.setAttribute('data-id', id);
+
+    return pictureElement;
   };
 
   var mixingData = function (data) {
@@ -63,51 +87,47 @@
     return data;
   };
 
-  var updateGallery = function () {
-
-    var filter = window.activeFilter.getAttribute('id');
+  var updateGallery = function (data, filter) {
 
     switch (filter) {
-      case filtersName.POPULAR:
-        render(pictureList);
-        window.gallery.elementList = pictureList;
-        break;
       case filtersName.NEW:
-        var mixingPictures = mixingData(pictureList.slice()).slice(0, MAX_NEW_PICTURES);
-        render(mixingPictures);
-        window.gallery.elementList = mixingPictures;
+        var mixingPictures = mixingData(data.slice()).slice(0, MAX_NEW_PICTURES);
+        renderPictureList(mixingPictures);
         break;
       case filtersName.DISSCUSED:
-        var popularPictures = pictureList.slice().
+        var popularPictures = data.slice().
           sort(function (left, right) {
-            var rankDiff = right.comments.length - left.comments.length;
-            if (rankDiff > 0) {
-              rankDiff = pictureList.indexOf(left) - pictureList.indexOf(right);
-            }
-            return rankDiff;
+            return right.comments.length - left.comments.length;
           });
-        render(popularPictures);
-        window.gallery.elementList = popularPictures;
+        renderPictureList(popularPictures);
         break;
       default:
-        render(pictureList);
+        renderPictureList(data);
         break;
     }
   };
 
   var successHandler = function (data) {
-    pictureList = data;
-    window.gallery.elementList = pictureList;
-    updateGallery();
+    picturesData = data;
+    filters.classList.remove(galleryClass.IMG_FILTERS_INACTIIVE);
+    updateGallery(picturesData);
   };
+
+  var onFilterChange = window.util.debounce(function () {
+    var filter = window.activeFilter.getAttribute('id');
+    updateGallery(picturesData, filter);
+  });
+
+  /* -------------------- actions --------------------------- */
 
   window.backend.action(successHandler, window.backend.error);
 
-  var onFilterChange = window.debounce(function () {
-    updateGallery();
+  pictures.addEventListener('click', function (evt) {
+    if (evt.target.classList.contains(galleryClass.PICTURE_IMG)) {
+      var dataId = evt.target.getAttribute('data-id');
+      window.preview.renderPreview(filteredData[dataId]);
+    }
   });
-
-  window.activeFilter = document.querySelector(gallerySelector.IMG_FILTERS_ACTIVE);
 
   filters.addEventListener('click', function (evt) {
     if (evt.target.className === galleryClass.IMG_FILTERS_BUTTON) {
@@ -117,17 +137,5 @@
       onFilterChange();
     }
   });
-
-  /* ------- open Preview -------- */
-
-  var previewList = document.querySelector(gallerySelector.PICTURE);
-
-  previewList.addEventListener('click', window.preview.onOpenPreview);
-
-  previewList.addEventListener('keydown', window.preview.onKeydownPreview);
-
-  window.gallery = {
-    elementList: []
-  };
 
 })();

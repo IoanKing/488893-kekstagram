@@ -5,6 +5,8 @@
 
 (function () {
 
+  var DEBOUNCE_INTERVAL = 500; // ms
+
   var utilClasses = {
     HIDDEN_CLASS: 'hidden',
     MODAL_OPEN_CLASS: 'modal-open',
@@ -49,11 +51,26 @@
     }
   };
 
+  var debounce = function (cb) {
+    var lastTimeout = null;
+
+    return function () {
+      var parameters = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        cb.apply(null, parameters);
+      }, DEBOUNCE_INTERVAL);
+    };
+  };
+
   window.util = {
     ESC_KEYCODE: Shortcuts.ESC_KEYCODE,
     ENTER_KEYCODE: Shortcuts.ENTER_KEYCODE,
     closePopup: closePopup,
     openPopup: openPopup,
-    removeChildren: removeChildren
+    removeChildren: removeChildren,
+    debounce: debounce
   };
 })();

@@ -10,7 +10,6 @@
   var previewClass = {
     HIDDEN: 'hidden',
     VISUALLY_HIDDEN: 'visually-hidden',
-    CLICK_TRAGET: 'picture__img',
     LOADER: 'comments-loader',
     COMMENTS_FULL_COUNT: 'comments-count',
     COMMENTS_CURRENT_COUNT: 'comments-count',
@@ -38,8 +37,9 @@
 
   var commentCountText = {
     FROM: ' из ',
-    COMMENT: ' комментариев.',
-    TAG: 'span'
+    TAG_BEGIN: '<span ="comments-count">',
+    TAG_END: '</span>',
+    COMMENT: ' комментариев.'
   };
 
   var closeButton = document.querySelector(previewSelector.BIG_CLOSE);
@@ -50,45 +50,20 @@
   var renderCommentCount = function (countCurrent, countFull) {
     var socialCommentCount = previewBlock.querySelector(previewSelector.SOCIAL_COMMENT_COUNT);
     socialCommentCount.innerHTML = '';
-    var commentsCountCurrent = document.createElement(commentCountText.TAG);
-    commentsCountCurrent.classList.add(previewClass.COMMENTS_CURRENT_COUNT);
-    commentsCountCurrent.textContent = countCurrent;
-    var commentsCountFull = document.createElement(commentCountText.TAG);
-    commentsCountFull.classList.add(previewClass.COMMENTS_FULL_COUNT);
-    commentsCountFull.textContent = countFull;
-    var textFrom = document.createTextNode(commentCountText.FROM);
-    var textCommentaries = document.createTextNode(commentCountText.COMMENT);
-    socialCommentCount.appendChild(commentsCountCurrent);
-    socialCommentCount.appendChild(textFrom);
-    socialCommentCount.appendChild(commentsCountFull);
-    socialCommentCount.appendChild(textCommentaries);
+    socialCommentCount.innerHTML = countCurrent + commentCountText.FROM + commentCountText.TAG_BEGIN + countFull + commentCountText.TAG_END + commentCountText.COMMENT;
   };
 
   var onClosePreview = function () {
     previewBlock.removeEventListener('click', onUpdateComments);
+    closeButton.removeEventListener('click', onClosePreview);
     window.util.closePopup(previewSelector.BIG_PICTURE, previewSelector.BODY);
   };
 
-  var getPreviewData = function (element) {
-    var pictureId = element.getAttribute('data-id');
+  var renderPreview = function (data) {
     window.util.openPopup(previewSelector.BIG_PICTURE, previewSelector.BODY);
-    window.preview.setPreview(window.gallery.elementList[pictureId]);
-
+    setPreview(data);
     closeButton.addEventListener('click', onClosePreview);
     previewBlock.addEventListener('click', onUpdateComments);
-  };
-
-  var onOpenPreview = function (evt) {
-    if (evt.target.classList.contains(previewClass.CLICK_TRAGET)) {
-      getPreviewData(evt.target);
-    }
-  };
-
-  var onKeydownPreview = function (evt) {
-    if (evt.keyCode === window.util.ENTER_KEYCODE) {
-      var tergetElement = evt.target.querySelector(previewSelector.PICTURE_IMG);
-      getPreviewData(tergetElement);
-    }
   };
 
   var onUpdateComments = function (evt) {
@@ -131,10 +106,11 @@
     window.util.removeChildren(socialComments, socialCommentList);
 
     var fragmentComments = document.createDocumentFragment();
-    for (var k = 0; k < data.comments.length; k++) {
-      var newComment = getComment(data.comments[k], socialCommentTemplate);
+    var commentsList = data.comments;
+    commentsList.forEach(function (comment) {
+      var newComment = getComment(comment, socialCommentTemplate);
       fragmentComments.appendChild(newComment);
-    }
+    });
     socialComments.appendChild(fragmentComments);
     return socialComments;
   };
@@ -149,9 +125,7 @@
   };
 
   window.preview = {
-    setPreview: setPreview,
-    onOpenPreview: onOpenPreview,
-    onKeydownPreview: onKeydownPreview
+    renderPreview: renderPreview,
   };
 
 })();
