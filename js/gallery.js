@@ -75,7 +75,7 @@
     return pictureElement;
   };
 
-  var mixingData = function (data) {
+  var mixData = function (data) {
     var j;
     var temp;
     for (var i = data.length - 1; i > 0; i--) {
@@ -91,7 +91,7 @@
 
     switch (filter) {
       case filtersName.NEW:
-        var mixingPictures = mixingData(data.slice()).slice(0, MAX_NEW_PICTURES);
+        var mixingPictures = mixData(data.slice()).slice(0, MAX_NEW_PICTURES);
         renderPictureList(mixingPictures);
         break;
       case filtersName.DISSCUSED:
@@ -109,7 +109,8 @@
 
   var successHandler = function (data) {
     picturesData = data;
-    filters.classList.remove(galleryClass.IMG_FILTERS_INACTIIVE);
+    var filtersBlock = document.querySelector(gallerySelector.IMG_FILTERS);
+    filtersBlock.classList.remove(galleryClass.IMG_FILTERS_INACTIIVE);
     updateGallery(picturesData);
   };
 
