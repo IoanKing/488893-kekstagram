@@ -41,6 +41,22 @@
 
   /* -------------------- functions --------------------------- */
 
+  var showFilterBlock = function () {
+    var filtersBlock = document.querySelector(gallerySelector.IMG_FILTERS);
+    filtersBlock.classList.remove(galleryClass.IMG_FILTERS_INACTIIVE);
+  };
+
+  var loadCheck = function (maxCount) {
+    var counter = 0;
+    var upCounter = function () {
+      counter++;
+      if (counter === maxCount) {
+        showFilterBlock();
+      }
+    };
+    return upCounter;
+  };
+
   var renderPictureList = function (data) {
     filteredData = data;
     var picturesElement = document.querySelector(gallerySelector.PICTURES);
@@ -59,6 +75,15 @@
     });
 
     picturesElement.appendChild(fragment);
+
+    var renderedPictures = picturesElement.querySelectorAll(gallerySelector.PICTURE_IMG);
+
+    var onPictureload = loadCheck(renderedPictures.length);
+
+    renderedPictures.forEach(function (renderedPicture) {
+      renderedPicture.addEventListener('load', onPictureload);
+    });
+
   };
 
   var renderPicture = function (picture, picturesTemplate, id) {
@@ -109,9 +134,7 @@
 
   var successHandler = function (data) {
     picturesData = data;
-    var filtersBlock = document.querySelector(gallerySelector.IMG_FILTERS);
-    filtersBlock.classList.remove(galleryClass.IMG_FILTERS_INACTIIVE);
-    updateGallery(picturesData);
+    renderPictureList(picturesData);
   };
 
   var onFilterChange = window.util.debounce(function () {
