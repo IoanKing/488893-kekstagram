@@ -9,7 +9,7 @@
     SCALE_MAX: 100,
     SCALE_MIN: 25,
     SCALE_STEP: 25,
-    SCALE_DEFAULT: 55,
+    SCALE_DEFAULT: 100
   };
 
   var Effects = {
@@ -79,7 +79,11 @@
     VALIDATION_DESCRIPTION: '.text__description',
     VALIDATION_HASHTAGS: '.text__hashtags',
 
-    UPLOAD_FORM: '#upload-select-image'
+    UPLOAD_FORM: '#upload-select-image',
+    ERROR: '.error',
+    SUCCESS: '.success',
+    BUTTON: '__button',
+    VISUALLY_HIDDEN: 'visually-hidden',
   };
 
   var Classes = {
@@ -87,10 +91,15 @@
     EFFECT_PREVIEW: 'effects__preview',
   };
 
-  var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
-  var imageEffects = document.querySelectorAll(Selectors.IMAGE_FILTER);
+  var preview = document.querySelector(Selectors.IMAGE_PREVIEW);
+  var effectList = document.querySelectorAll(Selectors.IMAGE_FILTER);
   var slider = document.querySelector(Selectors.SLIDER);
   var scaleImgValue = document.querySelector(Selectors.SCALE_VALUE);
+
+  var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
+  var levelPin = document.querySelector(Selectors.EFFECT_LEVEL_PIN);
+  var levelDepth = document.querySelector(Selectors.EFFECT_LEVEL_DEPTH);
+  var scaleValue = document.querySelector(Selectors.SCALE_VALUE);
 
   /* ------------- FUNCTIONS --------------- */
 
@@ -107,11 +116,6 @@
   };
 
   var renderEffect = function (element, effect, value) {
-    var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
-
-    var levelPin = document.querySelector(Selectors.EFFECT_LEVEL_PIN);
-    var levelDepth = document.querySelector(Selectors.EFFECT_LEVEL_DEPTH);
-
     var filter = Effects[effect.toUpperCase()];
     var proportion = getProportion(filter.min, filter.max, 1);
     var proportionUndo = getProportion(filter.min, filter.max, 0);
@@ -126,29 +130,69 @@
     levelDepth.style.width = valueFilterInPercent + '%';
   };
 
+  var showSendResult = function (status) {
+    switch (status) {
+      case Selectors.SUCCESS:
+        window.backend.successMessage.classList.remove(Selectors.VISUALLY_HIDDEN);
+        break;
+      case Selectors.ERROR:
+        window.backend.errorMessage.classList.remove(Selectors.VISUALLY_HIDDEN);
+        break;
+      default:
+        break;
+    }
+
+    var removeResultMessage = function () {
+      window.backend.successMessage.classList.add(Selectors.VISUALLY_HIDDEN);
+      window.backend.errorMessage.classList.add(Selectors.VISUALLY_HIDDEN);
+      document.removeEventListener('click', onClickClose);
+      document.removeEventListener('keydown', onKeydownClose);
+    };
+
+    var onClickClose = function (evt) {
+      var buttonClass = status + Selectors.BUTTON;
+      if (evt.target.className !== status || evt.target.className === buttonClass) {
+        removeResultMessage();
+      }
+    };
+
+    var onKeydownClose = function (evt) {
+      if (evt.keyCode === window.util.ESC_KEYCODE) {
+        removeResultMessage();
+      }
+    };
+
+    document.addEventListener('click', onClickClose);
+    document.addEventListener('keydown', onKeydownClose);
+  };
+
+  var resetPicture = function () {
+    uploadPicture.reset();
+    preview.style = '';
+    effectLevel.setAttribute('value', FILTER_DEFAULT);
+    levelPin.style.left = FILTER_DEFAULT + '%';
+    levelDepth.style.width = FILTER_DEFAULT + '%';
+    scaleValue.setAttribute('value', SCALE_DEFAULT);
+    slider.classList.add(Classes.HIDDEN_CLASS);
+  };
+
   var onCloseForm = function () {
     window.util.closePopup(Selectors.EDITOR_FORM);
-    uploadPicture.reset();
+    resetPicture();
+    showSendResult(Selectors.SUCCESS);
+  };
 
-    imagePreviews.style = '';
-    document.querySelector(Selectors.EFFECT_LEVEL)
-            .setAttribute('value', FILTER_DEFAULT);
-    document.querySelector(Selectors.EFFECT_LEVEL_PIN)
-            .style.left = FILTER_DEFAULT + '%';
-    document.querySelector(Selectors.EFFECT_LEVEL_DEPTH)
-            .style.width = FILTER_DEFAULT + '%';
-    document.querySelector(Selectors.SCALE_VALUE)
-            .setAttribute('value', SCALE_DEFAULT);
-    // setClassEffect(imagePreviews, 'none');
-    document.querySelector(Selectors.SLIDER)
-            .classList.add(Classes.HIDDEN_CLASS);
+  var onErrorForm = function () {
+    window.util.closePopup(Selectors.EDITOR_FORM);
+    resetPicture();
+    showSendResult(Selectors.ERROR);
   };
 
   var setEffectSlider = function (value) {
-    var elementEffect = imagePreviews.getAttribute('class');
+    var elementEffect = preview.getAttribute('class');
     var effect = elementEffect.substring(elementEffect.lastIndexOf('--') + 2, elementEffect.length);
 
-    renderEffect(imagePreviews, effect, value);
+    renderEffect(preview, effect, value);
   };
 
   var setClassEffect = function (element, effect) {
@@ -190,12 +234,12 @@
   };
 
   var setScale = function (modificator) {
-    /* modificator: Increase = 1, decrease = -1, nothing = 0  */
-    var scaleValue = parseInt(scaleImgValue.getAttribute('value'), 10);
-    var changedValue = (modificator === 100) ? ScaleSettings.SCALE_DEFAULT : Math.max(ScaleSettings.SCALE_MIN, Math.min(scaleValue + ScaleSettings.SCALE_STEP * modificator, ScaleSettings.SCALE_MAX));
+    /* modificator: Increase = 1, decrease = -1, default = 0  */
+    var currentValue = parseInt(scaleImgValue.getAttribute('value'), 10);
+    var changedValue = (modificator === 0) ? ScaleSettings.SCALE_DEFAULT : Math.max(ScaleSettings.SCALE_MIN, Math.min(currentValue + ScaleSettings.SCALE_STEP * modificator, ScaleSettings.SCALE_MAX));
 
     scaleImgValue.setAttribute('value', changedValue.toString() + '%');
-    imagePreviews.style.transform = 'scale(' + changedValue / 100 + ')';
+    preview.style.transform = 'scale(' + changedValue / 100 + ')';
   };
 
   /* ------- OPEN EDITOR FORM -------- */
@@ -212,8 +256,8 @@
   });
 
   var setEffect = function (effect) {
-    setClassEffect(imagePreviews, effect);
-    renderEffect(imagePreviews, effect, FILTER_DEFAULT);
+    setClassEffect(preview, effect);
+    renderEffect(preview, effect, FILTER_DEFAULT);
     if (effect !== EFFECTS_LIST[EFFECTS_LIST.length - 1].toLowerCase()) {
       slider.classList.remove(Classes.HIDDEN_CLASS);
     } else {
@@ -225,7 +269,7 @@
 
   setEffect('none');
 
-  imageEffects.forEach(function (element) {
+  effectList.forEach(function (element) {
     element.addEventListener('click', function () {
       var effect = element.getAttribute('value');
       setEffect(effect);
@@ -238,8 +282,6 @@
 
   var buttonScaleDecrease = document.querySelector(Selectors.SCALE_SMALLER);
   var buttonScaleIncrease = document.querySelector(Selectors.SCALE_BIGGER);
-
-  setScale(0);
 
   buttonScaleDecrease.addEventListener('click', function () {
     setScale(-1);
@@ -257,7 +299,8 @@
     var target = evt.target;
     var parsedHashtags = target.value.split(/\s+/);
     var validation = window.validation.getValidationHashtags(parsedHashtags);
-    evt.target.setCustomValidity(validation);
+    target.style.outline = (validation) ? window.validation.ERROR_OUTLINE : '';
+    target.setCustomValidity(validation);
   });
 
   var descriptionInput = document.querySelector(Selectors.VALIDATION_DESCRIPTION);
@@ -271,7 +314,7 @@
   uploadPicture.addEventListener('submit', function (evt) {
     evt.preventDefault();
 
-    window.backend.action(onCloseForm, window.backend.error, new FormData(uploadPicture));
+    window.backend.action(onCloseForm, onErrorForm, new FormData(uploadPicture));
   });
 
   window.forms = {

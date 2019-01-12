@@ -5,6 +5,8 @@
 
 (function () {
 
+  var MAX_NEW_PICTURES = 10;
+
   var gallerySelector = {
     PICTURES: '.pictures',
     PICTURE_ITEM: '.picture',
@@ -30,14 +32,12 @@
     DISSCUSED: 'filter-discussed'
   };
 
-  var MAX_NEW_PICTURES = 10;
-
   var picturesData = {};
   var filteredData = {};
 
   var filters = document.querySelector(gallerySelector.IMG_FILTERS);
   var pictures = document.querySelector(gallerySelector.PICTURES);
-  window.activeFilter = document.querySelector(gallerySelector.IMG_FILTERS_ACTIVE);
+  var activeFilter = document.querySelector(gallerySelector.IMG_FILTERS_ACTIVE);
 
   /* -------------------- functions --------------------------- */
 
@@ -46,7 +46,7 @@
     filtersBlock.classList.remove(galleryClass.IMG_FILTERS_INACTIIVE);
   };
 
-  var loadCheck = function (maxCount) {
+  var loadCompleteAction = function (maxCount) {
     var counter = 0;
     var upCounter = function () {
       counter++;
@@ -60,7 +60,7 @@
   var renderPictureList = function (data) {
     filteredData = data;
     var picturesElement = document.querySelector(gallerySelector.PICTURES);
-    var picturesTemplate = document.querySelector(gallerySelector.PICTURE_TEMPLATE)
+    var template = document.querySelector(gallerySelector.PICTURE_TEMPLATE)
         .content
         .querySelector(gallerySelector.PICTURE_ITEM);
     var elementList = picturesElement.querySelectorAll(gallerySelector.PICTURE_ITEM);
@@ -70,7 +70,7 @@
     var fragment = document.createDocumentFragment();
 
     data.forEach(function (element, i) {
-      var picture = renderPicture(element, picturesTemplate, i);
+      var picture = renderPicture(element, template, i);
       fragment.appendChild(picture);
     });
 
@@ -78,7 +78,7 @@
 
     var renderedPictures = picturesElement.querySelectorAll(gallerySelector.PICTURE_IMG);
 
-    var onPictureload = loadCheck(renderedPictures.length);
+    var onPictureload = loadCompleteAction(renderedPictures.length);
 
     renderedPictures.forEach(function (renderedPicture) {
       renderedPicture.addEventListener('load', onPictureload);
@@ -86,15 +86,15 @@
 
   };
 
-  var renderPicture = function (picture, picturesTemplate, id) {
-    var pictureElement = picturesTemplate.cloneNode(true);
+  var renderPicture = function (data, template, id) {
+    var pictureElement = template.cloneNode(true);
     var elementLink = pictureElement.querySelector(gallerySelector.PICTURE_IMG);
     var elementLikes = pictureElement.querySelector(gallerySelector.PICTURE_LIKES);
     var elementComment = pictureElement.querySelector(gallerySelector.PICTURE_COMMENT);
 
-    elementLink.src = picture.url;
-    elementLikes.textContent = picture.likes;
-    elementComment.textContent = picture.comments.length;
+    elementLink.src = data.url;
+    elementLikes.textContent = data.likes;
+    elementComment.textContent = data.comments.length;
     elementLink.setAttribute('data-id', id);
 
     return pictureElement;
@@ -132,19 +132,19 @@
     }
   };
 
-  var successHandler = function (data) {
+  var onSuccessLoadData = function (data) {
     picturesData = data;
     renderPictureList(picturesData);
   };
 
   var onFilterChange = window.util.debounce(function () {
-    var filter = window.activeFilter.getAttribute('id');
+    var filter = activeFilter.getAttribute('id');
     updateGallery(picturesData, filter);
   });
 
   /* -------------------- actions --------------------------- */
 
-  window.backend.action(successHandler, window.backend.error);
+  window.backend.action(onSuccessLoadData, window.backend.error);
 
   pictures.addEventListener('click', function (evt) {
     if (evt.target.classList.contains(galleryClass.PICTURE_IMG)) {
@@ -155,9 +155,9 @@
 
   filters.addEventListener('click', function (evt) {
     if (evt.target.className === galleryClass.IMG_FILTERS_BUTTON) {
-      window.activeFilter.classList.remove(galleryClass.IMG_FILTERS_ACTIVE);
-      window.activeFilter = evt.target;
-      window.activeFilter.classList.add(galleryClass.IMG_FILTERS_ACTIVE);
+      activeFilter.classList.remove(galleryClass.IMG_FILTERS_ACTIVE);
+      activeFilter = evt.target;
+      activeFilter.classList.add(galleryClass.IMG_FILTERS_ACTIVE);
       onFilterChange();
     }
   });

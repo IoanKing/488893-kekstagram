@@ -9,9 +9,15 @@
     SIZE: 'cover'
   };
 
-  var fileChooser = document.querySelector('#upload-file');
-  var preview = document.querySelector('.img-upload__preview img');
-  var filtersPreview = document.querySelectorAll('.effects__preview');
+  var uploadsSelectors = {
+    UPLOAD_FILE: '#upload-file',
+    PREVIEW_IMG: '.img-upload__preview img',
+    PREVIEW_EFFECTS: '.effects__preview'
+  };
+
+  var fileChooser = document.querySelector(uploadsSelectors.UPLOAD_FILE);
+  var preview = document.querySelector(uploadsSelectors.PREVIEW_IMG);
+  var filtersPreview = document.querySelectorAll(uploadsSelectors.PREVIEW_EFFECTS);
 
   var changeFilterPreviw = function (imagePath) {
     filtersPreview.forEach(function (element) {
@@ -35,7 +41,7 @@
       reader.addEventListener('load', function () {
         preview.src = reader.result;
         window.forms.setEffect('none');
-        window.forms.setScale(100);
+        window.forms.setScale(0);
         changeFilterPreviw(reader.result);
       });
 

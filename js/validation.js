@@ -12,6 +12,7 @@
   };
 
   var MAX_LENGTH = 140;
+  var ERROR_OUTLINE = '3px solid red';
 
   var ValidationMessage = {
     ERROR_SYMBOL: 'Хеш теги должны начинатся с символа ' + ValidationHashtag.FIRST_SYMBOL + '.',
@@ -36,32 +37,35 @@
     return false;
   };
 
+  var getValidationHashtags = function (hashtags) {
+    var isDouble = checkNonUniqueness(hashtags);
+    for (var i = 0; i < hashtags.length; i++) {
+      if (hashtags[i][0] !== ValidationHashtag.FIRST_SYMBOL) {
+        return ValidationMessage.ERROR_SYMBOL;
+      }
+      if (hashtags[i].length === 1) {
+        return ValidationMessage.ERROR_MINLENGTH;
+      }
+      if (hashtags[i].length >= ValidationHashtag.MAX_LENGTH) {
+        return ValidationMessage.ERROR_MAXLENGTH;
+      }
+      if (isDouble) {
+        return ValidationMessage.ERROR_DUBLICATES;
+      }
+      if (hashtags[i].lastIndexOf(ValidationHashtag.FIRST_SYMBOL) > 0) {
+        return ValidationMessage.ERROR_SPACES;
+      }
+      if (hashtags.length > ValidationHashtag.MAX_TAGS) {
+        return ValidationMessage.ERROR_MAXHASHTAGS;
+      }
+    }
+    return '';
+  };
+
   window.validation = {
     MAX_LENGTH: MAX_LENGTH,
-    getValidationHashtags: function (hashtags) {
-      var isDouble = checkNonUniqueness(hashtags);
-      for (var i = 0; i < hashtags.length; i++) {
-        if (hashtags[i][0] !== ValidationHashtag.FIRST_SYMBOL) {
-          return ValidationMessage.ERROR_SYMBOL;
-        }
-        if (hashtags[i].length === 1) {
-          return ValidationMessage.ERROR_MINLENGTH;
-        }
-        if (hashtags[i].length >= ValidationHashtag.MAX_LENGTH) {
-          return ValidationMessage.ERROR_MAXLENGTH;
-        }
-        if (isDouble) {
-          return ValidationMessage.ERROR_DUBLICATES;
-        }
-        if (hashtags[i].lastIndexOf(ValidationHashtag.FIRST_SYMBOL) > 0) {
-          return ValidationMessage.ERROR_SPACES;
-        }
-        if (hashtags.length > ValidationHashtag.MAX_TAGS) {
-          return ValidationMessage.ERROR_MAXHASHTAGS;
-        }
-      }
-      return '';
-    }
+    ERROR_OUTLINE: ERROR_OUTLINE,
+    getValidationHashtags: getValidationHashtags
   };
 
 })();

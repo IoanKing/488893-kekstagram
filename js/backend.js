@@ -8,9 +8,19 @@
   var URL_SEND = 'https://js.dump.academy/kekstagram';
 
   var TIMEOUT_REQUEST = 10000;
+  var VISUALLY_HIDDEN = 'visually-hidden';
 
-  var ErrorMessage = {
-    ANSWER_STATUS: 'Статус ответа: ',
+  var ErrorBlock = {
+    BLOCK: 'div',
+    STYLE: 'z-index: 100; margin: 0 auto; text-align: center; background-color: red; padding: 10px;',
+    POSITION: 'absolute',
+    LEFT: 0,
+    RIGHT: 0,
+    FONT_SIZE: '30px',
+  };
+
+  var errorText = {
+    ANSWER_STATUS: 'Не удалось получить данные: ',
     CONNECTION: 'Произошла ошибка соединения',
     TIMEOUT_BEGIN: 'Запрос не успел выполниться за ',
     TIMEOUT_END: 'мс'
@@ -20,7 +30,6 @@
     DISPLAY_AREA: 'main',
     ERROR: 'error',
     SUCCESS: 'success',
-    BUTTON: 'error__button',
   };
 
   var backendAction = function (onLoad, onError, data) {
@@ -31,14 +40,14 @@
       if (xhr.status === 200) {
         onLoad(xhr.response);
       } else {
-        onError(ErrorMessage.ANSWER_STATUS + xhr.status + ' ' + xhr.statusText);
+        onError(errorText.ANSWER_STATUS + xhr.statusText);
       }
     });
     xhr.addEventListener('error', function () {
-      onError(ErrorMessage.CONNECTION);
+      onError(errorText.CONNECTION);
     });
     xhr.addEventListener('timeout', function () {
-      onError(ErrorMessage.TIMEOUT_BEGIN + xhr.timeout + ErrorMessage.TIMEOUT_END);
+      onError(errorText.TIMEOUT_BEGIN + xhr.timeout + errorText.TIMEOUT_END);
     });
 
     xhr.timeout = TIMEOUT_REQUEST;
@@ -52,36 +61,43 @@
     xhr.send(data);
   };
 
-  var errorHandler = function () {
+  var renderSendPopup = function (status) {
     var messageArea = document.querySelector(requestResultPopup.DISPLAY_AREA);
-    var messageTemplate = document.querySelector('#' + requestResultPopup.ERROR)
+    var statusIdSelector = '#' + status;
+    var statusClassSelector = '.' + status;
+    var messageTemplate = document.querySelector(statusIdSelector)
         .content
-        .querySelector('.' + requestResultPopup.ERROR);
+        .querySelector(statusClassSelector);
+
+    messageTemplate.classList.add(VISUALLY_HIDDEN);
 
     var fragment = document.createDocumentFragment();
-
     fragment.appendChild(messageTemplate);
-
     messageArea.appendChild(fragment);
 
-    window.forms.close();
+    return messageTemplate;
+  };
 
-    messageArea.addEventListener('click', function (evt) {
-      if (evt.target.className === requestResultPopup.ERROR || evt.target.className === requestResultPopup.BUTTON) {
-        messageArea.removeChild(messageTemplate);
-      }
-    });
+  var successMessage = renderSendPopup(requestResultPopup.SUCCESS);
+  var errorMessage = renderSendPopup(requestResultPopup.ERROR);
 
-    document.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === window.util.ESC_KEYCODE) {
-        messageArea.removeChild(messageTemplate);
-      }
-    });
+  var errorHandler = function (message) {
+    var node = document.createElement(ErrorBlock.BLOCK);
+    node.style = ErrorBlock.STYLE;
+    node.style.position = ErrorBlock.POSITION;
+    node.style.left = ErrorBlock.LEFT;
+    node.style.right = ErrorBlock.RIGHT;
+    node.style.fontSize = ErrorBlock.FONT_SIZE;
+
+    node.textContent = message;
+    document.body.insertAdjacentElement('afterbegin', node);
   };
 
   window.backend = {
     action: backendAction,
-    error: errorHandler
+    error: errorHandler,
+    successMessage: successMessage,
+    errorMessage: errorMessage
   };
 
 })();
