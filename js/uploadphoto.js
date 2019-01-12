@@ -34,6 +34,8 @@
 
       reader.addEventListener('load', function () {
         preview.src = reader.result;
+        window.forms.setEffect('none');
+        window.forms.setScale(100);
         changeFilterPreviw(reader.result);
       });
 
