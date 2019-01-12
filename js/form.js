@@ -79,7 +79,11 @@
     VALIDATION_DESCRIPTION: '.text__description',
     VALIDATION_HASHTAGS: '.text__hashtags',
 
-    UPLOAD_FORM: '#upload-select-image'
+    UPLOAD_FORM: '#upload-select-image',
+    ERROR: '.error',
+    SUCCESS: '.success',
+    BUTTON: '__button',
+    VISUALLY_HIDDEN: 'visually-hidden',
   };
 
   var Classes = {
@@ -126,8 +130,43 @@
     levelDepth.style.width = valueFilterInPercent + '%';
   };
 
-  var onCloseForm = function () {
-    window.util.closePopup(Selectors.EDITOR_FORM);
+  var showSendResult = function (status) {
+    switch (status) {
+      case Selectors.SUCCESS:
+        window.backend.successMessage.classList.remove(Selectors.VISUALLY_HIDDEN);
+        break;
+      case Selectors.ERROR:
+        window.backend.errorMessage.classList.remove(Selectors.VISUALLY_HIDDEN);
+        break;
+      default:
+        break;
+    }
+
+    var removeResultMessage = function () {
+      window.backend.successMessage.classList.add(Selectors.VISUALLY_HIDDEN);
+      window.backend.errorMessage.classList.add(Selectors.VISUALLY_HIDDEN);
+      document.removeEventListener('click', onClickClose);
+      document.removeEventListener('keydown', onKeydownClose);
+    };
+
+    var onClickClose = function (evt) {
+      var buttonClass = status + Selectors.BUTTON;
+      if (evt.target.className !== status || evt.target.className === buttonClass) {
+        removeResultMessage();
+      }
+    };
+
+    var onKeydownClose = function (evt) {
+      if (evt.keyCode === window.util.ESC_KEYCODE) {
+        removeResultMessage();
+      }
+    };
+
+    document.addEventListener('click', onClickClose);
+    document.addEventListener('keydown', onKeydownClose);
+  };
+
+  var resetPicture = function () {
     uploadPicture.reset();
 
     imagePreviews.style = '';
@@ -139,9 +178,20 @@
             .style.width = FILTER_DEFAULT + '%';
     document.querySelector(Selectors.SCALE_VALUE)
             .setAttribute('value', SCALE_DEFAULT);
-    // setClassEffect(imagePreviews, 'none');
     document.querySelector(Selectors.SLIDER)
             .classList.add(Classes.HIDDEN_CLASS);
+  };
+
+  var onCloseForm = function () {
+    window.util.closePopup(Selectors.EDITOR_FORM);
+    resetPicture();
+    showSendResult(Selectors.SUCCESS);
+  };
+
+  var onErrorForm = function () {
+    window.util.closePopup(Selectors.EDITOR_FORM);
+    resetPicture();
+    showSendResult(Selectors.ERROR);
   };
 
   var setEffectSlider = function (value) {
@@ -272,7 +322,7 @@
   uploadPicture.addEventListener('submit', function (evt) {
     evt.preventDefault();
 
-    window.backend.action(onCloseForm, window.backend.error, new FormData(uploadPicture));
+    window.backend.action(onCloseForm, onErrorForm, new FormData(uploadPicture));
   });
 
   window.forms = {

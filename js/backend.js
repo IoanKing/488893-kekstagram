@@ -8,6 +8,7 @@
   var URL_SEND = 'https://js.dump.academy/kekstagram';
 
   var TIMEOUT_REQUEST = 10000;
+  var VISUALLY_HIDDEN = 'visually-hidden';
 
   var ErrorElement = {
     BLOCK: 'div',
@@ -23,6 +24,12 @@
     CONNECTION: 'Произошла ошибка соединения',
     TIMEOUT_BEGIN: 'Запрос не успел выполниться за ',
     TIMEOUT_END: 'мс'
+  };
+
+  var requestResultPopup = {
+    DISPLAY_AREA: 'main',
+    ERROR: 'error',
+    SUCCESS: 'success',
   };
 
   var backendAction = function (onLoad, onError, data) {
@@ -54,6 +61,26 @@
     xhr.send(data);
   };
 
+  var renderSendPopup = function (status) {
+    var messageArea = document.querySelector(requestResultPopup.DISPLAY_AREA);
+    var statusIdSelector = '#' + status;
+    var statusClassSelector = '.' + status;
+    var messageTemplate = document.querySelector(statusIdSelector)
+        .content
+        .querySelector(statusClassSelector);
+
+    messageTemplate.classList.add(VISUALLY_HIDDEN);
+
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(messageTemplate);
+    messageArea.appendChild(fragment);
+
+    return messageTemplate;
+  };
+
+  var successMessage = renderSendPopup(requestResultPopup.SUCCESS);
+  var errorMessage = renderSendPopup(requestResultPopup.ERROR);
+
   var errorHandler = function (message) {
     var node = document.createElement(ErrorElement.BLOCK);
     node.style = ErrorElement.STYLE;
@@ -68,7 +95,9 @@
 
   window.backend = {
     action: backendAction,
-    error: errorHandler
+    error: errorHandler,
+    successMessage: successMessage,
+    errorMessage: errorMessage
   };
 
 })();
