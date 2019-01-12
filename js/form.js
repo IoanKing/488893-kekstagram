@@ -257,7 +257,8 @@
     var target = evt.target;
     var parsedHashtags = target.value.split(/\s+/);
     var validation = window.validation.getValidationHashtags(parsedHashtags);
-    evt.target.setCustomValidity(validation);
+    target.style.outline = (validation) ? '3px solid red' : '';
+    target.setCustomValidity(validation);
   });
 
   var descriptionInput = document.querySelector(Selectors.VALIDATION_DESCRIPTION);
