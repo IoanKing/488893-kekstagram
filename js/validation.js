@@ -39,7 +39,7 @@
   window.validation = {
     MAX_LENGTH: MAX_LENGTH,
     getValidationHashtags: function (hashtags) {
-      var unique = checkNonUniqueness(hashtags);
+      var isDouble = checkNonUniqueness(hashtags);
       for (var i = 0; i < hashtags.length; i++) {
         if (hashtags[i][0] !== ValidationHashtag.FIRST_SYMBOL) {
           return ValidationMessage.ERROR_SYMBOL;
@@ -50,7 +50,7 @@
         if (hashtags[i].length >= ValidationHashtag.MAX_LENGTH) {
           return ValidationMessage.ERROR_MAXLENGTH;
         }
-        if (unique) {
+        if (isDouble) {
           return ValidationMessage.ERROR_DUBLICATES;
         }
         if (hashtags[i].lastIndexOf(ValidationHashtag.FIRST_SYMBOL) > 0) {

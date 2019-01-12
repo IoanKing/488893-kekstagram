@@ -9,6 +9,7 @@
     SCALE_MAX: 100,
     SCALE_MIN: 25,
     SCALE_STEP: 25,
+    SCALE_DEFAULT: 55,
   };
 
   var Effects = {
@@ -86,6 +87,11 @@
     EFFECT_PREVIEW: 'effects__preview',
   };
 
+  var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
+  var imageEffects = document.querySelectorAll(Selectors.IMAGE_FILTER);
+  var slider = document.querySelector(Selectors.SLIDER);
+  var scaleImgValue = document.querySelector(Selectors.SCALE_VALUE);
+
   /* ------------- FUNCTIONS --------------- */
 
   var getProportion = function (min, max, modificator) {
@@ -100,7 +106,7 @@
     return Math.round((Math.min(Math.max(newValue - minValue, 0), maxValue + minValue) / maxValue) * 100);
   };
 
-  var setEffect = function (element, effect, value) {
+  var renderEffect = function (element, effect, value) {
     var effectLevel = document.querySelector(Selectors.EFFECT_LEVEL);
 
     var levelPin = document.querySelector(Selectors.EFFECT_LEVEL_PIN);
@@ -124,7 +130,6 @@
     window.util.closePopup(Selectors.EDITOR_FORM);
     uploadPicture.reset();
 
-    var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
     imagePreviews.style = '';
     document.querySelector(Selectors.EFFECT_LEVEL)
             .setAttribute('value', FILTER_DEFAULT);
@@ -134,18 +139,16 @@
             .style.width = FILTER_DEFAULT + '%';
     document.querySelector(Selectors.SCALE_VALUE)
             .setAttribute('value', SCALE_DEFAULT);
-    setClassEffect(imagePreviews, 'none');
+    // setClassEffect(imagePreviews, 'none');
     document.querySelector(Selectors.SLIDER)
             .classList.add(Classes.HIDDEN_CLASS);
   };
 
   var setEffectSlider = function (value) {
-    var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
-
     var elementEffect = imagePreviews.getAttribute('class');
     var effect = elementEffect.substring(elementEffect.lastIndexOf('--') + 2, elementEffect.length);
 
-    setEffect(imagePreviews, effect, value);
+    renderEffect(imagePreviews, effect, value);
   };
 
   var setClassEffect = function (element, effect) {
@@ -186,13 +189,13 @@
     document.addEventListener('mouseup', onMouseUp);
   };
 
-  var setScale = function (element, valueAttribute, modificator) {
+  var setScale = function (modificator) {
     /* modificator: Increase = 1, decrease = -1, nothing = 0  */
-    var scaleValue = parseInt(valueAttribute.getAttribute('value'), 10);
-    var changedValue = Math.max(ScaleSettings.SCALE_MIN, Math.min(scaleValue + ScaleSettings.SCALE_STEP * modificator, ScaleSettings.SCALE_MAX));
+    var scaleValue = parseInt(scaleImgValue.getAttribute('value'), 10);
+    var changedValue = (modificator === 100) ? ScaleSettings.SCALE_DEFAULT : Math.max(ScaleSettings.SCALE_MIN, Math.min(scaleValue + ScaleSettings.SCALE_STEP * modificator, ScaleSettings.SCALE_MAX));
 
-    valueAttribute.setAttribute('value', changedValue.toString() + '%');
-    element.style.transform = 'scale(' + changedValue / 100 + ')';
+    scaleImgValue.setAttribute('value', changedValue.toString() + '%');
+    imagePreviews.style.transform = 'scale(' + changedValue / 100 + ')';
   };
 
   /* ------- OPEN EDITOR FORM -------- */
@@ -208,25 +211,24 @@
     });
   });
 
+  var setEffect = function (effect) {
+    setClassEffect(imagePreviews, effect);
+    renderEffect(imagePreviews, effect, FILTER_DEFAULT);
+    if (effect !== EFFECTS_LIST[EFFECTS_LIST.length - 1].toLowerCase()) {
+      slider.classList.remove(Classes.HIDDEN_CLASS);
+    } else {
+      slider.classList.add(Classes.HIDDEN_CLASS);
+    }
+  };
+
   /* ------- CHANGE EFFECTS -------- */
 
-  var imagePreviews = document.querySelector(Selectors.IMAGE_PREVIEW);
-  var imageEffects = document.querySelectorAll(Selectors.IMAGE_FILTER);
-
-  var slider = document.querySelector(Selectors.SLIDER);
-
-  slider.classList.add(Classes.HIDDEN_CLASS);
+  setEffect('none');
 
   imageEffects.forEach(function (element) {
     element.addEventListener('click', function () {
       var effect = element.getAttribute('value');
-      setClassEffect(imagePreviews, effect);
-      setEffect(imagePreviews, effect, FILTER_DEFAULT);
-      if (effect !== EFFECTS_LIST[EFFECTS_LIST.length - 1].toLowerCase()) {
-        slider.classList.remove(Classes.HIDDEN_CLASS);
-      } else {
-        slider.classList.add(Classes.HIDDEN_CLASS);
-      }
+      setEffect(effect);
     });
   });
 
@@ -234,18 +236,17 @@
 
   /* --------------- SCALE -----------------*/
 
-  var scaleImgValue = document.querySelector(Selectors.SCALE_VALUE);
   var buttonScaleDecrease = document.querySelector(Selectors.SCALE_SMALLER);
   var buttonScaleIncrease = document.querySelector(Selectors.SCALE_BIGGER);
 
-  setScale(imagePreviews, scaleImgValue, 0);
+  setScale(0);
 
   buttonScaleDecrease.addEventListener('click', function () {
-    setScale(imagePreviews, scaleImgValue, -1);
+    setScale(-1);
   });
 
   buttonScaleIncrease.addEventListener('click', function () {
-    setScale(imagePreviews, scaleImgValue, 1);
+    setScale(1);
   });
 
   /* --------------- VALIDATION -----------------*/
@@ -274,7 +275,9 @@
   });
 
   window.forms = {
-    close: onCloseForm
+    close: onCloseForm,
+    setEffect: setEffect,
+    setScale: setScale
   };
 
 })();
