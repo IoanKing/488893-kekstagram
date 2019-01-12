@@ -9,7 +9,7 @@
     SCALE_MAX: 100,
     SCALE_MIN: 25,
     SCALE_STEP: 25,
-    SCALE_DEFAULT: 55,
+    SCALE_DEFAULT: 100,
   };
 
   var Effects = {
