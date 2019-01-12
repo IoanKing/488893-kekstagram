@@ -36,13 +36,18 @@
       var openingAdditionalForm = document.querySelector(additionalElement);
       openingAdditionalForm.classList.add(utilClasses.MODAL_OPEN_CLASS);
     }
-    document.addEventListener('keydown', function (evt) {
+    var onKeydownEsc = function (evt) {
       var curentActiveElement = document.activeElement;
       var hasNoFocus = (curentActiveElement.classList.contains(utilClasses.HASHTAGS_FOCUS) || curentActiveElement.classList.contains(utilClasses.DESCRIPTION_FOCUS) || curentActiveElement.classList.contains(utilClasses.COMMENT_FOCUS)) ? false : true;
       if (evt.keyCode === window.util.ESC_KEYCODE && hasNoFocus) {
-        window.util.closePopup(element, additionalElement);
+        onClose();
       }
-    });
+    };
+    var onClose = function () {
+      closePopup(element, additionalElement);
+      document.removeEventListener('keydown', onKeydownEsc);
+    };
+    document.addEventListener('keydown', onKeydownEsc);
   };
 
   var removeChildren = function (parent, element) {

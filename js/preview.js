@@ -21,11 +21,8 @@
     BIG_CLOSE: '.big-picture__cancel',
     BIG_IMG: '.big-picture__img > img',
     BIG_PICTURE: '.big-picture',
-
     COMMENT_LOADER: '.comments-loader',
-
     LIKES_COUNT: '.likes-count',
-
     SOCIAL_CAPTION: '.social__caption',
     SOCIAL_COMMENTS: '.social__comments',
     SOCIAL_COMMENT: '.social__comment',
@@ -46,6 +43,11 @@
 
   var previewBlock = document.querySelector(previewSelector.BIG_PICTURE);
   var loader = document.querySelector(previewSelector.COMMENT_LOADER);
+  var socialComments = previewBlock.querySelector(previewSelector.SOCIAL_COMMENTS);
+  var socialCommentList = socialComments.querySelectorAll(previewSelector.SOCIAL_COMMENT);
+  var previewImg = previewBlock.querySelector(previewSelector.BIG_IMG);
+  var previewLikes = previewBlock.querySelector(previewSelector.LIKES_COUNT);
+  var previewSocialCaption = previewBlock.querySelector(previewSelector.SOCIAL_CAPTION);
 
   var renderCommentCount = function (countCurrent, countFull) {
     var socialCommentCount = previewBlock.querySelector(previewSelector.SOCIAL_COMMENT_COUNT);
@@ -100,8 +102,6 @@
   };
 
   var renderCommentlist = function (data) {
-    var socialComments = previewBlock.querySelector(previewSelector.SOCIAL_COMMENTS);
-    var socialCommentList = socialComments.querySelectorAll(previewSelector.SOCIAL_COMMENT);
     var socialCommentTemplate = socialCommentList[0].cloneNode(true);
     window.util.removeChildren(socialComments, socialCommentList);
 
@@ -116,9 +116,9 @@
   };
 
   var setPreview = function (data) {
-    previewBlock.querySelector(previewSelector.BIG_IMG).src = data.url;
-    previewBlock.querySelector(previewSelector.LIKES_COUNT).textContent = data.likes;
-    previewBlock.querySelector(previewSelector.SOCIAL_CAPTION).textContent = data.description;
+    previewImg.src = data.url;
+    previewLikes.textContent = data.likes;
+    previewSocialCaption.textContent = data.description;
 
     var commentList = renderCommentlist(data);
     showComment(commentList.children);

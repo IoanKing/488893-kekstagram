@@ -10,7 +10,7 @@
   var TIMEOUT_REQUEST = 10000;
   var VISUALLY_HIDDEN = 'visually-hidden';
 
-  var ErrorElement = {
+  var ErrorBlock = {
     BLOCK: 'div',
     STYLE: 'z-index: 100; margin: 0 auto; text-align: center; background-color: red; padding: 10px;',
     POSITION: 'absolute',
@@ -19,7 +19,7 @@
     FONT_SIZE: '30px',
   };
 
-  var ErrorMessage = {
+  var errorText = {
     ANSWER_STATUS: 'Не удалось получить данные: ',
     CONNECTION: 'Произошла ошибка соединения',
     TIMEOUT_BEGIN: 'Запрос не успел выполниться за ',
@@ -40,14 +40,14 @@
       if (xhr.status === 200) {
         onLoad(xhr.response);
       } else {
-        onError(ErrorMessage.ANSWER_STATUS + xhr.statusText);
+        onError(errorText.ANSWER_STATUS + xhr.statusText);
       }
     });
     xhr.addEventListener('error', function () {
-      onError(ErrorMessage.CONNECTION);
+      onError(errorText.CONNECTION);
     });
     xhr.addEventListener('timeout', function () {
-      onError(ErrorMessage.TIMEOUT_BEGIN + xhr.timeout + ErrorMessage.TIMEOUT_END);
+      onError(errorText.TIMEOUT_BEGIN + xhr.timeout + errorText.TIMEOUT_END);
     });
 
     xhr.timeout = TIMEOUT_REQUEST;
@@ -82,12 +82,12 @@
   var errorMessage = renderSendPopup(requestResultPopup.ERROR);
 
   var errorHandler = function (message) {
-    var node = document.createElement(ErrorElement.BLOCK);
-    node.style = ErrorElement.STYLE;
-    node.style.position = ErrorElement.POSITION;
-    node.style.left = ErrorElement.LEFT;
-    node.style.right = ErrorElement.RIGHT;
-    node.style.fontSize = ErrorElement.FONT_SIZE;
+    var node = document.createElement(ErrorBlock.BLOCK);
+    node.style = ErrorBlock.STYLE;
+    node.style.position = ErrorBlock.POSITION;
+    node.style.left = ErrorBlock.LEFT;
+    node.style.right = ErrorBlock.RIGHT;
+    node.style.fontSize = ErrorBlock.FONT_SIZE;
 
     node.textContent = message;
     document.body.insertAdjacentElement('afterbegin', node);
