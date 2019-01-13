@@ -37,7 +37,7 @@
     return false;
   };
 
-  var getValidationHashtags = function (hashtags) {
+  var validateHashtags = function (hashtags) {
     var isDouble = checkNonUniqueness(hashtags);
     for (var i = 0; i < hashtags.length; i++) {
       if (hashtags[i][0] !== ValidationHashtag.FIRST_SYMBOL) {
@@ -65,7 +65,7 @@
   window.validation = {
     MAX_LENGTH: MAX_LENGTH,
     ERROR_OUTLINE: ERROR_OUTLINE,
-    getValidationHashtags: getValidationHashtags
+    validateHashtags: validateHashtags
   };
 
 })();

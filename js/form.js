@@ -298,7 +298,7 @@
   hashtagInput.addEventListener('input', function (evt) {
     var target = evt.target;
     var parsedHashtags = target.value.split(/\s+/);
-    var validation = window.validation.getValidationHashtags(parsedHashtags);
+    var validation = window.validation.validateHashtags(parsedHashtags);
     target.style.outline = (validation) ? window.validation.ERROR_OUTLINE : '';
     target.setCustomValidity(validation);
   });
