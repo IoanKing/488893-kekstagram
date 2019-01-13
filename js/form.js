@@ -14,7 +14,7 @@
 
   var FILTER_DEFAULT = 100;
 
-  var Effect = {
+  var filterEffect = {
     CHROME: {
       filter: 'grayscale',
       min: 0,
@@ -53,7 +53,7 @@
     },
   };
 
-  var effectLists = Object.keys(Effect);
+  var effectLists = Object.keys(filterEffect);
 
   var preview = document.querySelector(window.ElementSelector.IMAGE_PREVIEW);
   var effectList = document.querySelectorAll(window.ElementSelector.IMAGE_FILTER);
@@ -80,7 +80,7 @@
   };
 
   var renderEffect = function (element, effect, value) {
-    var filter = Effect[effect.toUpperCase()];
+    var filter = filterEffect[effect.toUpperCase()];
     var proportion = getProportion(filter.min, filter.max, 1);
     var proportionUndo = getProportion(filter.min, filter.max, 0);
 

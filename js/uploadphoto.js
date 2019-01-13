@@ -6,7 +6,7 @@
 (function () {
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
 
-  var PreviewStyle = {
+  var previewStyle = {
     POSITION: '50% 50%',
     SIZE: 'cover'
   };
@@ -18,8 +18,8 @@
   var changeFilterPreviw = function (imagePath) {
     filtersPreview.forEach(function (element) {
       element.style.backgroundImage = 'url("' + imagePath + '")';
-      element.style.backgroundPisition = PreviewStyle.POSITION;
-      element.style.backgroundSize = PreviewStyle.SIZE;
+      element.style.backgroundPisition = previewStyle.POSITION;
+      element.style.backgroundSize = previewStyle.SIZE;
     });
   };
 
