@@ -1,45 +1,37 @@
 'use strict';
 
 /* Модуль с общими функциями */
-/* Зависимости: util.js */
+/* Зависимости: constants.js */
 
 (function () {
 
   var DEBOUNCE_INTERVAL = 500; // ms
 
-  var utilClasses = {
-    HIDDEN_CLASS: 'hidden',
-    MODAL_OPEN_CLASS: 'modal-open',
-    HASHTAGS_FOCUS: 'text__hashtags',
-    DESCRIPTION_FOCUS: 'text__description',
-    COMMENT_FOCUS: 'social__footer-text',
-  };
-
-  var Shortcuts = {
+  var Shortcut = {
     ESC_KEYCODE: 27,
     ENTER_KEYCODE: 13,
   };
 
   var closePopup = function (element, additionalElement) {
     var closureElement = document.querySelector(element);
-    closureElement.classList.add(utilClasses.HIDDEN_CLASS);
+    closureElement.classList.add(window.ElementClass.HIDDEN);
     if (additionalElement) {
       var closureAdditionalForm = document.querySelector(additionalElement);
-      closureAdditionalForm.classList.remove(utilClasses.MODAL_OPEN_CLASS);
+      closureAdditionalForm.classList.remove(window.ElementClass.MODAL_OPEN_CLASS);
     }
   };
 
   var openPopup = function (element, additionalElement) {
     var openingElement = document.querySelector(element);
-    openingElement.classList.remove(utilClasses.HIDDEN_CLASS);
+    openingElement.classList.remove(window.ElementClass.HIDDEN);
     if (additionalElement) {
       var openingAdditionalForm = document.querySelector(additionalElement);
-      openingAdditionalForm.classList.add(utilClasses.MODAL_OPEN_CLASS);
+      openingAdditionalForm.classList.add(window.ElementClass.MODAL_OPEN_CLASS);
     }
     var onKeydownEsc = function (evt) {
       var curentActiveElement = document.activeElement;
-      var hasNoFocus = (curentActiveElement.classList.contains(utilClasses.HASHTAGS_FOCUS) || curentActiveElement.classList.contains(utilClasses.DESCRIPTION_FOCUS) || curentActiveElement.classList.contains(utilClasses.COMMENT_FOCUS)) ? false : true;
-      if (evt.keyCode === window.util.ESC_KEYCODE && hasNoFocus) {
+      var hasNoFocus = (curentActiveElement.classList.contains(window.ElementClass.HASHTAGS_FOCUS) || curentActiveElement.classList.contains(window.ElementClass.DESCRIPTION_FOCUS) || curentActiveElement.classList.contains(window.ElementClass.COMMENT_FOCUS)) ? false : true;
+      if (evt.keyCode === Shortcut.ESC_KEYCODE && hasNoFocus) {
         onClose();
       }
     };
@@ -71,8 +63,8 @@
   };
 
   window.util = {
-    ESC_KEYCODE: Shortcuts.ESC_KEYCODE,
-    ENTER_KEYCODE: Shortcuts.ENTER_KEYCODE,
+    ESC_KEYCODE: Shortcut.ESC_KEYCODE,
+    ENTER_KEYCODE: Shortcut.ENTER_KEYCODE,
     closePopup: closePopup,
     openPopup: openPopup,
     removeChildren: removeChildren,
