@@ -314,7 +314,7 @@
   uploadPicture.addEventListener('submit', function (evt) {
     evt.preventDefault();
 
-    window.backend.action(onCloseForm, onErrorForm, new FormData(uploadPicture));
+    window.backend.executionRequest(onCloseForm, onErrorForm, new FormData(uploadPicture));
   });
 
   window.forms = {

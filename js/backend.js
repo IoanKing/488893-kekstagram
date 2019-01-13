@@ -32,7 +32,7 @@
     SUCCESS: 'success',
   };
 
-  var backendAction = function (onLoad, onError, data) {
+  var executionRequest = function (onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
@@ -94,7 +94,7 @@
   };
 
   window.backend = {
-    action: backendAction,
+    executionRequest: executionRequest,
     error: errorHandler,
     successMessage: successMessage,
     errorMessage: errorMessage

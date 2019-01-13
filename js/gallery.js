@@ -144,7 +144,7 @@
 
   /* -------------------- actions --------------------------- */
 
-  window.backend.action(onSuccessLoadData, window.backend.error);
+  window.backend.executionRequest(onSuccessLoadData, window.backend.error);
 
   pictures.addEventListener('click', function (evt) {
     if (evt.target.classList.contains(galleryClass.PICTURE_IMG)) {
