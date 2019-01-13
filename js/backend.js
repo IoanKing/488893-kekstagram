@@ -10,7 +10,7 @@
   var TIMEOUT_REQUEST = 10000;
   var VISUALLY_HIDDEN = 'visually-hidden';
 
-  var ErrorBlock = {
+  var errorBlock = {
     BLOCK: 'div',
     STYLE: 'z-index: 100; margin: 0 auto; text-align: center; background-color: red; padding: 10px;',
     POSITION: 'absolute',
@@ -76,12 +76,12 @@
   var errorMessage = renderSendPopup(window.ElementClass.ERROR);
 
   var onConnectionError = function (message) {
-    var node = document.createElement(ErrorBlock.BLOCK);
-    node.style = ErrorBlock.STYLE;
-    node.style.position = ErrorBlock.POSITION;
-    node.style.left = ErrorBlock.LEFT;
-    node.style.right = ErrorBlock.RIGHT;
-    node.style.fontSize = ErrorBlock.FONT_SIZE;
+    var node = document.createElement(errorBlock.BLOCK);
+    node.style = errorBlock.STYLE;
+    node.style.position = errorBlock.POSITION;
+    node.style.left = errorBlock.LEFT;
+    node.style.right = errorBlock.RIGHT;
+    node.style.fontSize = errorBlock.FONT_SIZE;
 
     node.textContent = message;
     document.body.insertAdjacentElement('afterbegin', node);

@@ -19,7 +19,6 @@
   var previewBlock = document.querySelector(window.ElementSelector.BIG_PICTURE);
   var loader = document.querySelector(window.ElementSelector.COMMENT_LOADER);
   var socialComment = previewBlock.querySelector(window.ElementSelector.SOCIAL_COMMENTS);
-  var socialCommentList = socialComment.querySelectorAll(window.ElementSelector.SOCIAL_COMMENT);
   var previewImg = previewBlock.querySelector(window.ElementSelector.BIG_IMG);
   var previewLike = previewBlock.querySelector(window.ElementSelector.LIKES_COUNT);
   var previewSocialCaption = previewBlock.querySelector(window.ElementSelector.SOCIAL_CAPTION);
@@ -77,6 +76,7 @@
   };
 
   var renderCommentlist = function (data) {
+    var socialCommentList = socialComment.querySelectorAll(window.ElementSelector.SOCIAL_COMMENT);
     var socialCommentTemplate = socialCommentList[0].cloneNode(true);
     window.util.removeChildren(socialComment, socialCommentList);
 

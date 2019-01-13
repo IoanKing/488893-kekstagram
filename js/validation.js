@@ -5,7 +5,7 @@
 
 (function () {
 
-  var ValidationHashtag = {
+  var validationHashtag = {
     FIRST_SYMBOL: '#',
     MAX_LENGTH: 20,
     MAX_TAGS: 5,
@@ -15,12 +15,12 @@
   var ERROR_OUTLINE = '3px solid red';
 
   var ValidationMessage = {
-    ERROR_SYMBOL: 'Хеш теги должны начинатся с символа ' + ValidationHashtag.FIRST_SYMBOL + '.',
-    ERROR_MINLENGTH: 'Хеш-тег не может состоять только из одного символа ' + ValidationHashtag.FIRST_SYMBOL + '.',
-    ERROR_MAXLENGTH: 'Максимальная длина одного хэш-тега ' + ValidationHashtag.MAX_LENGTH + ' символов, включая решётку.',
+    ERROR_SYMBOL: 'Хеш теги должны начинатся с символа ' + validationHashtag.FIRST_SYMBOL + '.',
+    ERROR_MINLENGTH: 'Хеш-тег не может состоять только из одного символа ' + validationHashtag.FIRST_SYMBOL + '.',
+    ERROR_MAXLENGTH: 'Максимальная длина одного хэш-тега ' + validationHashtag.MAX_LENGTH + ' символов, включая решётку.',
     ERROR_DUBLICATES: 'Один и тот же хэш-тег не может быть использован дважды.',
     ERROR_SPACES: 'Хэш-теги разделяются пробелами.',
-    ERROR_MAXHASHTAGS: 'Нельзя указать больше ' + ValidationHashtag.MAX_TAGS + ' хэш-тегов.',
+    ERROR_MAXHASHTAGS: 'Нельзя указать больше ' + validationHashtag.MAX_TAGS + ' хэш-тегов.',
   };
 
   var checkUnique = function (collection) {
@@ -40,22 +40,22 @@
   var validateHashtags = function (hashtags) {
     var isDouble = checkUnique(hashtags);
     for (var i = 0; i < hashtags.length; i++) {
-      if (hashtags[i][0] !== ValidationHashtag.FIRST_SYMBOL) {
+      if (hashtags[i][0] !== validationHashtag.FIRST_SYMBOL) {
         return ValidationMessage.ERROR_SYMBOL;
       }
       if (hashtags[i].length === 1) {
         return ValidationMessage.ERROR_MINLENGTH;
       }
-      if (hashtags[i].length >= ValidationHashtag.MAX_LENGTH) {
+      if (hashtags[i].length >= validationHashtag.MAX_LENGTH) {
         return ValidationMessage.ERROR_MAXLENGTH;
       }
       if (isDouble) {
         return ValidationMessage.ERROR_DUBLICATES;
       }
-      if (hashtags[i].lastIndexOf(ValidationHashtag.FIRST_SYMBOL) > 0) {
+      if (hashtags[i].lastIndexOf(validationHashtag.FIRST_SYMBOL) > 0) {
         return ValidationMessage.ERROR_SPACES;
       }
-      if (hashtags.length > ValidationHashtag.MAX_TAGS) {
+      if (hashtags.length > validationHashtag.MAX_TAGS) {
         return ValidationMessage.ERROR_MAXHASHTAGS;
       }
     }
