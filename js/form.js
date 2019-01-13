@@ -53,7 +53,7 @@
     },
   };
 
-  var effectLists = Object.keys(filterEffect);
+  var effects = Object.keys(filterEffect);
 
   var preview = document.querySelector(window.ElementSelector.IMAGE_PREVIEW);
   var effectList = document.querySelectorAll(window.ElementSelector.IMAGE_FILTER);
@@ -159,11 +159,11 @@
     renderEffect(preview, effect, value);
   };
 
-  var setClassEffect = function (element, effect) {
-    for (var i = 0; i < effectLists.length; i++) {
-      element.classList.remove(window.ElementSelector.EFFECT_PREVIEW + '--' + effectLists[i].toLowerCase());
-      if (effect === effectLists[i].toLowerCase()) {
-        element.classList.add(window.ElementSelector.EFFECT_PREVIEW + '--' + effect);
+  var setClassEffect = function (element, effectName) {
+    for (var i = 0; i < effects.length; i++) {
+      element.classList.remove(window.ElementSelector.EFFECT_PREVIEW + '--' + effects[i].toLowerCase());
+      if (effectName === effects[i].toLowerCase()) {
+        element.classList.add(window.ElementSelector.EFFECT_PREVIEW + '--' + effectName);
       }
     }
   };
@@ -219,10 +219,10 @@
     });
   });
 
-  var setEffect = function (effect) {
-    setClassEffect(preview, effect);
-    renderEffect(preview, effect, FILTER_DEFAULT);
-    if (effect !== effectLists[effectLists.length - 1].toLowerCase()) {
+  var setEffect = function (effectName) {
+    setClassEffect(preview, effectName);
+    renderEffect(preview, effectName, FILTER_DEFAULT);
+    if (effectName !== effects[effects.length - 1].toLowerCase()) {
       slider.classList.remove(window.ElementClass.HIDDEN);
     } else {
       slider.classList.add(window.ElementClass.HIDDEN);

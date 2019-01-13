@@ -49,11 +49,11 @@
     }
   };
 
-  var getComment = function (commentsArr, template) {
+  var getComment = function (comments, template) {
     var commentTemplate = template.cloneNode(true);
     commentTemplate.classList.add(window.ElementClass.VISUALLY_HIDDEN);
-    commentTemplate.querySelector(window.ElementSelector.SOCIAL_PICTURE).src = commentsArr.avatar;
-    commentTemplate.querySelector(window.ElementSelector.SOCIAL_TEXT).textContent = commentsArr.message;
+    commentTemplate.querySelector(window.ElementSelector.SOCIAL_PICTURE).src = comments.avatar;
+    commentTemplate.querySelector(window.ElementSelector.SOCIAL_TEXT).textContent = comments.message;
     return commentTemplate;
   };
 
@@ -61,18 +61,18 @@
     return (isHide) ? loader.classList.add(window.ElementClass.HIDDEN) : loader.classList.remove(window.ElementClass.HIDDEN);
   };
 
-  var showComment = function (elementList) {
+  var showComment = function (elements) {
     var showStep = 0;
     var currentCount = 0;
-    for (var i = 0; i < elementList.length && showStep < COMMENT_VIEW_MAX; i++) {
-      if (elementList[i].classList.contains(window.ElementClass.VISUALLY_HIDDEN)) {
-        elementList[i].classList.remove(window.ElementClass.VISUALLY_HIDDEN);
+    for (var i = 0; i < elements.length && showStep < COMMENT_VIEW_MAX; i++) {
+      if (elements[i].classList.contains(window.ElementClass.VISUALLY_HIDDEN)) {
+        elements[i].classList.remove(window.ElementClass.VISUALLY_HIDDEN);
         showStep++;
       }
       currentCount++;
     }
-    renderCommentCount(Math.min(currentCount, elementList.length), elementList.length);
-    hideLoaderButton(elementList.length <= currentCount);
+    renderCommentCount(Math.min(currentCount, elements.length), elements.length);
+    hideLoaderButton(elements.length <= currentCount);
   };
 
   var renderCommentlist = function (data) {
@@ -81,8 +81,8 @@
     window.util.removeChildren(socialComment, socialCommentList);
 
     var fragmentComments = document.createDocumentFragment();
-    var commentsList = data.comments;
-    commentsList.forEach(function (comment) {
+    var comments = data.comments;
+    comments.forEach(function (comment) {
       var newComment = getComment(comment, socialCommentTemplate);
       fragmentComments.appendChild(newComment);
     });

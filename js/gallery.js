@@ -13,8 +13,8 @@
     DISSCUSED: 'filter-discussed'
   };
 
-  var picturesData = {};
-  var filteredData = {};
+  var pictures = [];
+  var filteredPictures = [];
 
   var filter = document.querySelector(window.ElementSelector.IMG_FILTERS);
   var picture = document.querySelector(window.ElementSelector.PICTURES);
@@ -38,19 +38,19 @@
     return upCounter;
   };
 
-  var renderPictureList = function (data) {
-    filteredData = data;
+  var renderPictureList = function (collections) {
+    filteredPictures = collections.slice();
     var picturesElement = document.querySelector(window.ElementSelector.PICTURES);
     var template = document.querySelector(window.ElementSelector.PICTURE_TEMPLATE)
         .content
         .querySelector(window.ElementSelector.PICTURE_ITEM);
-    var elementList = picturesElement.querySelectorAll(window.ElementSelector.PICTURE_ITEM);
+    var elements = picturesElement.querySelectorAll(window.ElementSelector.PICTURE_ITEM);
 
-    window.util.removeChildren(picturesElement, elementList);
+    window.util.removeChildren(picturesElement, elements);
 
     var fragment = document.createDocumentFragment();
 
-    data.forEach(function (element, i) {
+    collections.forEach(function (element, i) {
       var renderedElement = renderPicture(element, template, i);
       fragment.appendChild(renderedElement);
     });
@@ -114,13 +114,13 @@
   };
 
   var onSuccessLoadData = function (data) {
-    picturesData = data;
-    renderPictureList(picturesData);
+    pictures = data.slice();
+    renderPictureList(pictures);
   };
 
   var onFilterChange = window.util.debounce(function () {
     var currentFilter = activeFilter.getAttribute('id');
-    updateGallery(picturesData, currentFilter);
+    updateGallery(pictures, currentFilter);
   });
 
   /* -------------------- actions --------------------------- */
@@ -130,7 +130,7 @@
   picture.addEventListener('click', function (evt) {
     if (evt.target.classList.contains(window.ElementClass.PICTURE_IMG)) {
       var dataId = evt.target.getAttribute('data-id');
-      window.preview.renderPreview(filteredData[dataId]);
+      window.preview.renderPreview(filteredPictures[dataId]);
     }
   });
 

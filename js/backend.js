@@ -26,7 +26,7 @@
     TIMEOUT_END: 'мс'
   };
 
-  var executionRequest = function (onLoad, onError, data) {
+  var sendRequest = function (onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
@@ -88,8 +88,8 @@
   };
 
   window.backend = {
-    onSendData: executionRequest,
-    onLoadData: executionRequest,
+    onSendData: sendRequest,
+    onLoadData: sendRequest,
     onConnectionError: onConnectionError,
     successMessage: successMessage,
     errorMessage: errorMessage
