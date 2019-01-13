@@ -23,7 +23,7 @@
     ERROR_MAXHASHTAGS: 'Нельзя указать больше ' + ValidationHashtag.MAX_TAGS + ' хэш-тегов.',
   };
 
-  var checkNonUniqueness = function (collection) {
+  var checkUnique = function (collection) {
     var unifiedCollection = collection.map(function (element) {
       return element.toLowerCase();
     });
@@ -37,8 +37,8 @@
     return false;
   };
 
-  var getValidationHashtags = function (hashtags) {
-    var isDouble = checkNonUniqueness(hashtags);
+  var validateHashtags = function (hashtags) {
+    var isDouble = checkUnique(hashtags);
     for (var i = 0; i < hashtags.length; i++) {
       if (hashtags[i][0] !== ValidationHashtag.FIRST_SYMBOL) {
         return ValidationMessage.ERROR_SYMBOL;
@@ -65,7 +65,7 @@
   window.validation = {
     MAX_LENGTH: MAX_LENGTH,
     ERROR_OUTLINE: ERROR_OUTLINE,
-    getValidationHashtags: getValidationHashtags
+    validateHashtags: validateHashtags
   };
 
 })();

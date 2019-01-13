@@ -1,7 +1,7 @@
 'use strict';
 
 /* Модуль работы с сетью */
-/* Зависимости: picture.js, preview.js, util.js */
+/* Зависимости: constants.js */
 
 (function () {
   var URL_LOAD = 'https://js.dump.academy/kekstagram/data';
@@ -19,20 +19,14 @@
     FONT_SIZE: '30px',
   };
 
-  var errorText = {
+  var ErrorText = {
     ANSWER_STATUS: 'Не удалось получить данные: ',
     CONNECTION: 'Произошла ошибка соединения',
     TIMEOUT_BEGIN: 'Запрос не успел выполниться за ',
     TIMEOUT_END: 'мс'
   };
 
-  var requestResultPopup = {
-    DISPLAY_AREA: 'main',
-    ERROR: 'error',
-    SUCCESS: 'success',
-  };
-
-  var backendAction = function (onLoad, onError, data) {
+  var executionRequest = function (onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
@@ -40,14 +34,14 @@
       if (xhr.status === 200) {
         onLoad(xhr.response);
       } else {
-        onError(errorText.ANSWER_STATUS + xhr.statusText);
+        onError(ErrorText.ANSWER_STATUS + xhr.statusText);
       }
     });
     xhr.addEventListener('error', function () {
-      onError(errorText.CONNECTION);
+      onError(ErrorText.CONNECTION);
     });
     xhr.addEventListener('timeout', function () {
-      onError(errorText.TIMEOUT_BEGIN + xhr.timeout + errorText.TIMEOUT_END);
+      onError(ErrorText.TIMEOUT_BEGIN + xhr.timeout + ErrorText.TIMEOUT_END);
     });
 
     xhr.timeout = TIMEOUT_REQUEST;
@@ -62,7 +56,7 @@
   };
 
   var renderSendPopup = function (status) {
-    var messageArea = document.querySelector(requestResultPopup.DISPLAY_AREA);
+    var messageArea = document.querySelector(window.ElementSelector.MAIN);
     var statusIdSelector = '#' + status;
     var statusClassSelector = '.' + status;
     var messageTemplate = document.querySelector(statusIdSelector)
@@ -78,10 +72,10 @@
     return messageTemplate;
   };
 
-  var successMessage = renderSendPopup(requestResultPopup.SUCCESS);
-  var errorMessage = renderSendPopup(requestResultPopup.ERROR);
+  var successMessage = renderSendPopup(window.ElementClass.SUCCESS);
+  var errorMessage = renderSendPopup(window.ElementClass.ERROR);
 
-  var errorHandler = function (message) {
+  var onConnectionError = function (message) {
     var node = document.createElement(ErrorBlock.BLOCK);
     node.style = ErrorBlock.STYLE;
     node.style.position = ErrorBlock.POSITION;
@@ -94,8 +88,9 @@
   };
 
   window.backend = {
-    action: backendAction,
-    error: errorHandler,
+    onSendData: executionRequest,
+    onLoadData: executionRequest,
+    onConnectionError: onConnectionError,
     successMessage: successMessage,
     errorMessage: errorMessage
   };

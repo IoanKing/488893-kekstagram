@@ -1,29 +1,25 @@
-// Файл uploadphoto.js
 'use strict';
+
+/* Модуль загрузки фотографии в Preview */
+/* Зависимости: constants.js */
 
 (function () {
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
 
-  var previewStyle = {
+  var PreviewStyle = {
     POSITION: '50% 50%',
     SIZE: 'cover'
   };
 
-  var uploadsSelectors = {
-    UPLOAD_FILE: '#upload-file',
-    PREVIEW_IMG: '.img-upload__preview img',
-    PREVIEW_EFFECTS: '.effects__preview'
-  };
-
-  var fileChooser = document.querySelector(uploadsSelectors.UPLOAD_FILE);
-  var preview = document.querySelector(uploadsSelectors.PREVIEW_IMG);
-  var filtersPreview = document.querySelectorAll(uploadsSelectors.PREVIEW_EFFECTS);
+  var fileChooser = document.querySelector(window.ElementSelector.UPLOAD_FILE);
+  var preview = document.querySelector(window.ElementSelector.PREVIEW_IMG);
+  var filtersPreview = document.querySelectorAll(window.ElementSelector.PREVIEW_EFFECTS);
 
   var changeFilterPreviw = function (imagePath) {
     filtersPreview.forEach(function (element) {
       element.style.backgroundImage = 'url("' + imagePath + '")';
-      element.style.backgroundPisition = previewStyle.POSITION;
-      element.style.backgroundSize = previewStyle.SIZE;
+      element.style.backgroundPisition = PreviewStyle.POSITION;
+      element.style.backgroundSize = PreviewStyle.SIZE;
     });
   };
 
