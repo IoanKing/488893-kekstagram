@@ -81,7 +81,7 @@
   var successMessage = renderSendPopup(requestResultPopup.SUCCESS);
   var errorMessage = renderSendPopup(requestResultPopup.ERROR);
 
-  var errorHandler = function (message) {
+  var onConnectionError = function (message) {
     var node = document.createElement(ErrorBlock.BLOCK);
     node.style = ErrorBlock.STYLE;
     node.style.position = ErrorBlock.POSITION;
@@ -94,8 +94,9 @@
   };
 
   window.backend = {
-    executionRequest: executionRequest,
-    error: errorHandler,
+    onSendData: executionRequest,
+    onLoadData: executionRequest,
+    onConnectionError: onConnectionError,
     successMessage: successMessage,
     errorMessage: errorMessage
   };
