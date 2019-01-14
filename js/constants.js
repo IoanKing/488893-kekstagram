@@ -49,6 +49,7 @@
     VALIDATION_DESCRIPTION: '.text__description',
     VALIDATION_HASHTAGS: '.text__hashtags',
     VISUALLY_HIDDEN: '.visually-hidden',
+    FILTER_DEFAULT_NAME: '#effect-none',
   };
   window.ElementClass = {
     COMMENT_FOCUS: 'social__footer-text',
@@ -63,6 +64,7 @@
     IMG_FILTERS_INACTIIVE: 'img-filters--inactive',
     LOADER: 'comments-loader',
     MODAL_OPEN_CLASS: 'modal-open',
+    PICTURE: 'picture',
     PICTURE_IMG: 'picture__img',
     VISUALLY_HIDDEN: 'visually-hidden',
     ERROR: 'error',

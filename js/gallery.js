@@ -115,6 +115,7 @@
 
   var onSuccessLoadData = function (data) {
     pictures = data.slice();
+    filteredPictures = pictures;
     renderPictureList(pictures);
   };
 
@@ -130,6 +131,15 @@
   picture.addEventListener('click', function (evt) {
     if (evt.target.classList.contains(window.ElementClass.PICTURE_IMG)) {
       var dataId = evt.target.getAttribute('data-id');
+      window.preview.renderPreview(filteredPictures[dataId]);
+    }
+  });
+
+  document.addEventListener('keydown', function (evt) {
+    var focusElement = document.activeElement;
+    if (evt.keyCode === window.util.ENTER_KEYCODE && focusElement.classList.contains(window.ElementClass.PICTURE)) {
+      var imageElement = focusElement.querySelector(window.ElementSelector.PICTURE_IMG);
+      var dataId = imageElement.getAttribute('data-id');
       window.preview.renderPreview(filteredPictures[dataId]);
     }
   });
