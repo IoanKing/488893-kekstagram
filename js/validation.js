@@ -7,7 +7,7 @@
 
   var validationHashtag = {
     FIRST_SYMBOL: '#',
-    MAX_LENGTH: 21,
+    MAX_LENGTH: 20,
     MAX_TAGS: 5,
   };
 
@@ -46,7 +46,7 @@
       if (hashtags[i].length === 1) {
         return ValidationMessage.ERROR_MINLENGTH;
       }
-      if (hashtags[i].length >= validationHashtag.MAX_LENGTH) {
+      if (hashtags[i].length >= validationHashtag.MAX_LENGTH + 1) {
         return ValidationMessage.ERROR_MAXLENGTH;
       }
       if (isDouble) {
