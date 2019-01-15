@@ -35,7 +35,7 @@
     window.util.closePopup(window.ElementSelector.BIG_PICTURE, window.ElementSelector.BODY);
   };
 
-  var showPreview = function (data) {
+  var renderPreview = function (data) {
     window.util.openPopup(window.ElementSelector.BIG_PICTURE, window.ElementSelector.BODY);
     setPreview(data);
     closeButton.addEventListener('click', onClosePreview);
@@ -100,7 +100,7 @@
   };
 
   window.preview = {
-    show: showPreview,
+    render: renderPreview,
   };
 
 })();
