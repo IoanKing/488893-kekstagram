@@ -14,6 +14,7 @@
   var fileChooser = document.querySelector(window.ElementSelector.UPLOAD_FILE);
   var preview = document.querySelector(window.ElementSelector.PREVIEW_IMG);
   var filtersPreview = document.querySelectorAll(window.ElementSelector.PREVIEW_EFFECTS);
+  var filterDefault = document.querySelector(window.ElementSelector.FILTER_DEFAULT_NAME);
 
   var changeFilterPreviw = function (imagePath) {
     filtersPreview.forEach(function (element) {
@@ -38,6 +39,7 @@
         preview.src = reader.result;
         window.forms.setEffect('none');
         window.forms.setScale(0);
+        filterDefault.checked = true;
         changeFilterPreviw(reader.result);
       });
 

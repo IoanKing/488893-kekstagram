@@ -46,7 +46,7 @@
       if (hashtags[i].length === 1) {
         return ValidationMessage.ERROR_MINLENGTH;
       }
-      if (hashtags[i].length >= validationHashtag.MAX_LENGTH) {
+      if (hashtags[i].length >= validationHashtag.MAX_LENGTH + 1) {
         return ValidationMessage.ERROR_MAXLENGTH;
       }
       if (isDouble) {
